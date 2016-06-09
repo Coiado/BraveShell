@@ -16,6 +16,8 @@
 		6B47AD231D099A6200910647 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B47AD221D099A6200910647 /* Assets.xcassets */; };
 		6B47AD2E1D099A6200910647 /* GamerFuelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B47AD2D1D099A6200910647 /* GamerFuelTests.swift */; };
 		6B47AD391D099A6200910647 /* GamerFuelUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B47AD381D099A6200910647 /* GamerFuelUITests.swift */; };
+		6B47AD491D099F3C00910647 /* VirtualGameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B47AD481D099F3C00910647 /* VirtualGameController.framework */; };
+		6B47AD4A1D099F3C00910647 /* VirtualGameController.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B47AD481D099F3C00910647 /* VirtualGameController.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +37,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		6B47AD4B1D099F3C00910647 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				6B47AD4A1D099F3C00910647 /* VirtualGameController.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		6B47AD121D099A6200910647 /* GamerFuel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GamerFuel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B47AD151D099A6200910647 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -51,6 +67,8 @@
 		6B47AD341D099A6200910647 /* GamerFuelUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GamerFuelUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B47AD381D099A6200910647 /* GamerFuelUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamerFuelUITests.swift; sourceTree = "<group>"; };
 		6B47AD3A1D099A6200910647 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6B47AD461D099F2D00910647 /* VirtualGameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VirtualGameController.framework; path = Carthage/Build/tvOS/VirtualGameController.framework; sourceTree = "<group>"; };
+		6B47AD481D099F3C00910647 /* VirtualGameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VirtualGameController.framework; path = Carthage/Build/tvOS/VirtualGameController.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +76,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6B47AD491D099F3C00910647 /* VirtualGameController.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,6 +100,8 @@
 		6B47AD091D099A6200910647 = {
 			isa = PBXGroup;
 			children = (
+				6B47AD481D099F3C00910647 /* VirtualGameController.framework */,
+				6B47AD461D099F2D00910647 /* VirtualGameController.framework */,
 				6B47AD141D099A6200910647 /* GamerFuel */,
 				6B47AD2C1D099A6200910647 /* GamerFuelTests */,
 				6B47AD371D099A6200910647 /* GamerFuelUITests */,
@@ -141,6 +162,7 @@
 				6B47AD0E1D099A6200910647 /* Sources */,
 				6B47AD0F1D099A6200910647 /* Frameworks */,
 				6B47AD101D099A6200910647 /* Resources */,
+				6B47AD4B1D099F3C00910647 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -400,6 +422,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+				);
 				INFOPLIST_FILE = GamerFuel/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = EvandroDePaula.GamerFuel;
@@ -412,6 +438,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+				);
 				INFOPLIST_FILE = GamerFuel/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = EvandroDePaula.GamerFuel;
@@ -486,6 +516,7 @@
 				6B47AD3F1D099A6200910647 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6B47AD401D099A6200910647 /* Build configuration list for PBXNativeTarget "GamerFuelTests" */ = {
 			isa = XCConfigurationList;
@@ -494,6 +525,7 @@
 				6B47AD421D099A6200910647 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6B47AD431D099A6200910647 /* Build configuration list for PBXNativeTarget "GamerFuelUITests" */ = {
 			isa = XCConfigurationList;
@@ -502,6 +534,7 @@
 				6B47AD451D099A6200910647 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

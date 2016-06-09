@@ -7,6 +7,7 @@
 //
 
 import SpriteKit
+import VirtualGameController
 
 class GameScene: SKScene {
     override func didMoveToView(view: SKView) {
