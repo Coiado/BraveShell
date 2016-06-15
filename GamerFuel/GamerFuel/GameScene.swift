@@ -37,31 +37,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
         
-        bgImage = SKSpriteNode(imageNamed:"espaco")
-        self.addChild(bgImage!)
-        bgImage!.position = CGPointMake(self.size.width/2, self.size.height/2)
+        var background = SKSpriteNode(imageNamed: "back_placeholder")
+        background.position = CGPointMake(self.size.width/2, self.size.height/2);
+        self.addChild(background)
+        
         
         
         self.createHero()
         self.createCrosshair()
         
         
+        print(self.view?.frame.width)
+        
         
         //set the physics world
         self.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
         self.physicsWorld.contactDelegate = self
-        self.physicsBody = SKPhysicsBody.init(edgeLoopFromRect: self.frame)
-        self.physicsBody?.categoryBitMask = PhysicsCategories.floor
-        self.physicsBody?.contactTestBitMask = PhysicsCategories.floor | PhysicsCategories.Hero
-        self.physicsBody?.collisionBitMask = PhysicsCategories.floor | PhysicsCategories.Hero
+        let borderBody = SKPhysicsBody(edgeLoopFromRect: self.frame)
+        borderBody.friction = 1
+        borderBody.restitution = 0
+        self.physicsBody = borderBody
         self.name = "edge"
     
-        // 1
-        let borderBody = SKPhysicsBody(edgeLoopFromRect: self.frame)
-        // 2
-        borderBody.friction = 0
-        // 3
-        self.physicsBody = borderBody
         
         //crosshair config
         self.crosshairMoviment(self.crosshair!)
@@ -71,6 +68,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         //set controller
         self.setControllersEvents()
         
+        
+        runAction(SKAction.repeatActionForever(
+            SKAction.sequence([
+                SKAction.runBlock(addEnemy),
+                SKAction.waitForDuration(4.0)
+                ])
+            ))
 
     }
     
@@ -88,9 +92,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
         
-        if (hero?.position.y)! == ((self.hero?.frame.height)! + 100) {
-            self.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
-        }
+     
         
         enumerateChildNodesWithName("enemy") { (enemy, _) in
             if enemy.position.y <= 0 {
@@ -108,10 +110,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      */
     func createHero(){
         
-        hero = SKSpriteNode(imageNamed: "Spaceship")
+        hero = SKSpriteNode(imageNamed: "fulero_placeholder")
         hero!.xScale = 0.1
         hero!.yScale = 0.1
-        hero!.position = CGPoint(x: CGRectGetMidX(self.frame), y:((self.hero?.frame.height)! + 100))
+        hero!.position = CGPoint(x: CGRectGetMidX(self.frame), y: (CGRectGetMinY(self.frame) + CGRectGetMaxY(hero!.frame)  ) )
         hero!.physicsBody = SKPhysicsBody(rectangleOfSize: hero!.size)
         hero!.physicsBody?.usesPreciseCollisionDetection = true
         hero!.physicsBody?.collisionBitMask = PhysicsCategories.Hero | PhysicsCategories.Crosshair | PhysicsCategories.Enemy | PhysicsCategories.floor
@@ -119,9 +121,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         hero!.physicsBody?.contactTestBitMask = PhysicsCategories.Hero | PhysicsCategories.Crosshair | PhysicsCategories.Enemy | PhysicsCategories.floor
         hero!.physicsBody?.allowsRotation = false
         hero!.physicsBody?.friction = 0
+        hero!.physicsBody?.restitution = 0
         hero!.physicsBody?.linearDamping = 0
-        hero!.physicsBody?.mass = self.frame.height * self.frame.width
+        hero?.physicsBody?.angularDamping = 0
+        hero!.physicsBody?.mass = 28
         hero!.physicsBody?.affectedByGravity  = true
+        hero?.physicsBody?.dynamic = true
         hero!.name = "hero"
         self.addChild(hero!)
 
@@ -136,11 +141,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         crosshair!.xScale = 0.2
         crosshair!.yScale = 0.2
         crosshair!.position = CGPoint(x: CGRectGetMinX(hero!.frame)/50, y: (CGRectGetMaxY(hero!.frame)+50))
-//        crosshair!.physicsBody = SKPhysicsBody(rectangleOfSize: crosshair!.size)
-//        crosshair!.physicsBody?.usesPreciseCollisionDetection = true
-//        crosshair!.physicsBody?.categoryBitMask = PhysicsCategories.Crosshair
-//        crosshair!.physicsBody?.collisionBitMask = PhysicsCategories.Crosshair | PhysicsCategories.Hero
-//        crosshair!.physicsBody?.dynamic = false
         crosshair!.name = "small"
         hero!.addChild(crosshair!)
 
@@ -164,24 +164,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         enemy.xScale = 0.1
         enemy.yScale = 0.1
         enemy.physicsBody = SKPhysicsBody(rectangleOfSize: enemy.size)
-        enemy.physicsBody?.dynamic = true
+        enemy.physicsBody?.dynamic = false
         enemy.physicsBody?.categoryBitMask = PhysicsCategories.Enemy
         enemy.physicsBody?.contactTestBitMask = PhysicsCategories.Hero
         enemy.physicsBody?.collisionBitMask = PhysicsCategories.Hero
         enemy.name = "enemy"
         
         //it needs to be improved
-        let actualX = random(min: enemy.size.width/2, max: size.width - enemy.size.height/2)
+        let actualX = random(min: enemy.size.width/2, max: size.width - enemy.size.height)
         
         enemy.position = CGPoint(x:actualX,  y: size.height + enemy.size.height/2)
         
         addChild(enemy)
         
-        let actualDuration = random(min: CGFloat(2.0), max: CGFloat(4.0))
+        let actualDuration = random(min: CGFloat(5), max: CGFloat(10.0))
         
-        let actionMove = SKAction.moveTo(CGPoint(x: actualX, y: 0), duration: NSTimeInterval(actualDuration))
+        let actionMove = SKAction.moveTo(CGPoint(x: actualX, y: -10), duration: NSTimeInterval(actualDuration))
         let actionMoveDone = SKAction.removeFromParent()
-        enemy.runAction(SKAction.sequence([actionMove, actionMoveDone]))
+        enemy.runAction(SKAction.sequence([actionMove]))
 
     }
     
@@ -193,17 +193,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         let action = SKAction.repeatActionForever(SKAction.sequence([clockWiseMoviment,antiClockWiseMoviment]))
         
-        node.runAction(firstMoviment)
+        node.runAction(firstMoviment, withKey:"firstMovment")
         node.runAction(action,withKey:"crosshairAction")
         
         
-        
-        runAction(SKAction.repeatActionForever(
-            SKAction.sequence([
-                SKAction.runBlock(addEnemy),
-                SKAction.waitForDuration(1.0)
-                ])
-            ))
 
     }
     
@@ -283,7 +276,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if item.type == .PlayPause{
                 print("pressed")
                 self.startTime = NSDate()
-                self.removeActionForKey("crosshairAction")
+                //self.removeActionForKey("crosshairAction")
+                crosshair?.removeAllActions()
                 
             }
         }
@@ -299,7 +293,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let jumpDownAction = SKAction.moveByX(CGFloat(((crosshair!.zRotation * 180)/CGFloat(M_PI)) * (-1)), y: -1 * yAxis,duration:0.8)
         
         // sequence of move yup then down
-        let jumpSequence = SKAction.sequence([jumpUpAction, jumpDownAction])
+        let jumpSequence = SKAction.sequence([jumpUpAction,jumpDownAction])
         
         // make player run sequence
         hero!.runAction(jumpSequence)
@@ -314,20 +308,29 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 self.endDate = NSDate()
                 let timePressed = CFDateGetTimeIntervalSinceDate(endDate, startTime)
                 if timePressed < 0.2 {
+                    self.physicsWorld.gravity = CGVector(dx: 0, dy: -2.8)
                     self.jump((self.frame.height) * 0.3)
                 }else
                 if timePressed > 0.5 {
-                    //self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
+                    self.physicsWorld.gravity = CGVector(dx: 0, dy: -2.8)
                     self.jump((self.frame.height) * 0.8)
 
                 }else {
-                    self.jump(40)
+                    self.physicsWorld.gravity = CGVector(dx: 0, dy: -2.8)
+                    self.jump((self.frame.height) * 0.2)
                 }
                 
                 print("released\(timePressed)")
+                self.crosshair?.zRotation = 0.0
+                self.crosshair?.zPosition = 0.0
+                
+                
+                self.crosshairMoviment(crosshair!)
+            
             }
         }
     }
+    
     
     
     
@@ -346,7 +349,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0) && ((secondBody.categoryBitMask & PhysicsCategories.floor) != 0) {
             print("HIT THE FLOOR")
-            self.hero?.position.y = (self.hero?.size.height)! + 20
+            //self.hero?.position.y = (self.hero?.size.height)! + 20
             
         }else if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0 && ((secondBody.categoryBitMask & PhysicsCategories.Enemy) != 0)) {
             self.removeEnemy(secondBody.node as! SKSpriteNode)
