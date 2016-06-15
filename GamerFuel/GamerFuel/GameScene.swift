@@ -7,7 +7,7 @@
 //
 
 import SpriteKit
-import VirtualGameController
+import GameController
 
 /**
  *  Describes the colision mask between nodes
@@ -26,19 +26,47 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //MARK: - properties
     var hero: SKSpriteNode?
     var crosshair: SKSpriteNode?
+    var bgImage: SKSpriteNode?
+    var floor:SKSpriteNode?
+    var startTime:NSDate?
+    var endDate:NSDate?
+    
+    var numOfPoints:Int = 0
     
     //Life cycle view
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
         
+        bgImage = SKSpriteNode(imageNamed:"espaco")
+        self.addChild(bgImage!)
+        bgImage!.position = CGPointMake(self.size.width/2, self.size.height/2)
+        
+        
         self.createHero()
         self.createCrosshair()
+        
+        
+        
         //set the physics world
         self.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
         self.physicsWorld.contactDelegate = self
+        self.physicsBody = SKPhysicsBody.init(edgeLoopFromRect: self.frame)
+        self.physicsBody?.categoryBitMask = PhysicsCategories.floor
+        self.physicsBody?.contactTestBitMask = PhysicsCategories.floor | PhysicsCategories.Hero
+        self.physicsBody?.collisionBitMask = PhysicsCategories.floor | PhysicsCategories.Hero
+        self.name = "edge"
+    
+        // 1
+        let borderBody = SKPhysicsBody(edgeLoopFromRect: self.frame)
+        // 2
+        borderBody.friction = 0
+        // 3
+        self.physicsBody = borderBody
         
         //crosshair config
         self.crosshairMoviment(self.crosshair!)
+        
+
         
         //set controller
         self.setControllersEvents()
@@ -47,14 +75,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     
+    
 
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         /* Called when a touch begins */
+        
+        //print("touch")
+        self.jumpPlayer()
     }
    
     //MARK: - Screen update
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
+        
+        if (hero?.position.y)! == ((self.hero?.frame.height)! + 100) {
+            self.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
+        }
+        
+        enumerateChildNodesWithName("enemy") { (enemy, _) in
+            if enemy.position.y <= 0 {
+                self.updateEnemy(enemy)
+            }
+        }
     }
     
     
@@ -67,14 +109,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func createHero(){
         
         hero = SKSpriteNode(imageNamed: "Spaceship")
-        hero!.xScale = 0.5
-        hero!.yScale = 0.5
-        hero!.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame))
+        hero!.xScale = 0.1
+        hero!.yScale = 0.1
+        hero!.position = CGPoint(x: CGRectGetMidX(self.frame), y:((self.hero?.frame.height)! + 100))
         hero!.physicsBody = SKPhysicsBody(rectangleOfSize: hero!.size)
         hero!.physicsBody?.usesPreciseCollisionDetection = true
-        hero!.physicsBody?.collisionBitMask = PhysicsCategories.Hero | PhysicsCategories.Crosshair
+        hero!.physicsBody?.collisionBitMask = PhysicsCategories.Hero | PhysicsCategories.Crosshair | PhysicsCategories.Enemy | PhysicsCategories.floor
         hero!.physicsBody?.categoryBitMask = PhysicsCategories.Hero
-        hero!.physicsBody?.contactTestBitMask = PhysicsCategories.Hero | PhysicsCategories.Crosshair
+        hero!.physicsBody?.contactTestBitMask = PhysicsCategories.Hero | PhysicsCategories.Crosshair | PhysicsCategories.Enemy | PhysicsCategories.floor
+        hero!.physicsBody?.allowsRotation = false
+        hero!.physicsBody?.friction = 0
+        hero!.physicsBody?.linearDamping = 0
+        hero!.physicsBody?.mass = self.frame.height * self.frame.width
+        hero!.physicsBody?.affectedByGravity  = true
         hero!.name = "hero"
         self.addChild(hero!)
 
@@ -85,15 +132,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      */
     func createCrosshair(){
         
-        crosshair = SKSpriteNode(imageNamed: "Spaceship")
+        self.crosshair = SKSpriteNode(imageNamed: "Spaceship")
         crosshair!.xScale = 0.2
         crosshair!.yScale = 0.2
-        crosshair!.position = CGPoint(x: CGRectGetMinX(hero!.frame)/50, y: CGRectGetMinY(hero!.frame))
-        crosshair!.physicsBody = SKPhysicsBody(rectangleOfSize: crosshair!.size)
-        crosshair!.physicsBody?.usesPreciseCollisionDetection = true
-        crosshair!.physicsBody?.categoryBitMask = PhysicsCategories.Crosshair
-        crosshair!.physicsBody?.collisionBitMask = PhysicsCategories.Crosshair | PhysicsCategories.Hero
-        crosshair!.physicsBody?.dynamic = true
+        crosshair!.position = CGPoint(x: CGRectGetMinX(hero!.frame)/50, y: (CGRectGetMaxY(hero!.frame)+50))
+//        crosshair!.physicsBody = SKPhysicsBody(rectangleOfSize: crosshair!.size)
+//        crosshair!.physicsBody?.usesPreciseCollisionDetection = true
+//        crosshair!.physicsBody?.categoryBitMask = PhysicsCategories.Crosshair
+//        crosshair!.physicsBody?.collisionBitMask = PhysicsCategories.Crosshair | PhysicsCategories.Hero
+//        crosshair!.physicsBody?.dynamic = false
         crosshair!.name = "small"
         hero!.addChild(crosshair!)
 
@@ -116,6 +163,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         enemy.xScale = 0.1
         enemy.yScale = 0.1
+        enemy.physicsBody = SKPhysicsBody(rectangleOfSize: enemy.size)
+        enemy.physicsBody?.dynamic = true
+        enemy.physicsBody?.categoryBitMask = PhysicsCategories.Enemy
+        enemy.physicsBody?.contactTestBitMask = PhysicsCategories.Hero
+        enemy.physicsBody?.collisionBitMask = PhysicsCategories.Hero
+        enemy.name = "enemy"
         
         //it needs to be improved
         let actualX = random(min: enemy.size.width/2, max: size.width - enemy.size.height/2)
@@ -141,7 +194,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let action = SKAction.repeatActionForever(SKAction.sequence([clockWiseMoviment,antiClockWiseMoviment]))
         
         node.runAction(firstMoviment)
-        node.runAction(action)
+        node.runAction(action,withKey:"crosshairAction")
         
         
         
@@ -176,22 +229,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         swipeDown.direction = .Down
         view!.addGestureRecognizer(swipeDown)
         
-        func pressesBegan(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
-            for item in presses {
-                if item.type == .Select {
-                    //self.view.backgroundColor = UIColor.greenColor()
-                    print("btn Pressed")
-                    self.hero!.removeFromParent()
-                }
-            }
-        }
         
-        
-        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(GameScene.tapped(_:)))
-        tapRecognizer.allowedPressTypes = [NSNumber(integer: UIPressType.PlayPause.rawValue)];
-        self.view!.addGestureRecognizer(tapRecognizer)
 
     }
+    
+    //MARK:- impulse action
+    func jumpPlayer() {
+        // 1
+        let impulse =  CGVector(dx: 0, dy: 75)
+        // 2
+        hero!.physicsBody?.applyImpulse(impulse)
+    }
+
     
     
     // Handle Swipe Events
@@ -224,6 +273,101 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         // make player run sequence
         hero!.runAction(jumpSequence)
+    }
+    
+    
+    //Low level press events
+    override func pressesBegan(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
+        for item in presses {
+
+            if item.type == .PlayPause{
+                print("pressed")
+                self.startTime = NSDate()
+                self.removeActionForKey("crosshairAction")
+                
+            }
+        }
+    }
+    
+    func jump(yAxis:CGFloat){
+        let cross = self.childNodeWithName("small")
+        
+        print("cross \(cross)")
+        // move up 20
+        let jumpUpAction = SKAction.moveByX(CGFloat(((crosshair!.zRotation * 180)/CGFloat(M_PI)) * (-1)),y:yAxis, duration: 0.5)
+        // move down 20
+        let jumpDownAction = SKAction.moveByX(CGFloat(((crosshair!.zRotation * 180)/CGFloat(M_PI)) * (-1)), y: -1 * yAxis,duration:0.8)
+        
+        // sequence of move yup then down
+        let jumpSequence = SKAction.sequence([jumpUpAction, jumpDownAction])
+        
+        // make player run sequence
+        hero!.runAction(jumpSequence)
+
+        
+    }
+    
+    override func pressesEnded(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
+        for item in presses {
+            if item.type == UIPressType.PlayPause {
+                //self.view!.backgroundColor = UIColor.whiteColor()
+                self.endDate = NSDate()
+                let timePressed = CFDateGetTimeIntervalSinceDate(endDate, startTime)
+                if timePressed < 0.2 {
+                    self.jump((self.frame.height) * 0.3)
+                }else
+                if timePressed > 0.5 {
+                    //self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
+                    self.jump((self.frame.height) * 0.8)
+
+                }else {
+                    self.jump(40)
+                }
+                
+                print("released\(timePressed)")
+            }
+        }
+    }
+    
+    
+    
+    //MARK: - Colision detect
+    func didBeginContact(contact: SKPhysicsContact) {
+        let firstBody:SKPhysicsBody
+        let secondBody:SKPhysicsBody
+        
+        if contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask {
+            firstBody = contact.bodyA
+            secondBody = contact.bodyB
+        } else {
+            firstBody = contact.bodyB
+            secondBody = contact.bodyA
+        }
+        
+        if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0) && ((secondBody.categoryBitMask & PhysicsCategories.floor) != 0) {
+            print("HIT THE FLOOR")
+            self.hero?.position.y = (self.hero?.size.height)! + 20
+            
+        }else if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0 && ((secondBody.categoryBitMask & PhysicsCategories.Enemy) != 0)) {
+            self.removeEnemy(secondBody.node as! SKSpriteNode)
+            print("HIT AN ENEMY")
+        }
+    }
+    
+    //MARK:- Game actions
+    func removeEnemy(enemy:SKSpriteNode){
+        enemy.removeFromParent()
+    }
+    
+    func updateEnemy(enemy:SKNode){
+        
+        if enemy.position.y < 0 {
+            
+            enemy.removeFromParent()
+            numOfPoints += 1
+            
+            print("NUMBER OF POINTS \(numOfPoints)")
+        }
     }
 
     

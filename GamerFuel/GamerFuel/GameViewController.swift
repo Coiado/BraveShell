@@ -10,11 +10,18 @@ import UIKit
 import SpriteKit
 
 class GameViewController: UIViewController {
+    
+    let gameScene = GameScene(fileNamed: "GameScene")
+    //var gameScene: GameScene?
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if let scene = GameScene(fileNamed: "GameScene") {
+        //if let scene = GameScene(fileNamed: "GameScene") {
+            
+            // store game scene reference
+            //gameScene = scene
+            
             // Configure the view.
             let skView = self.view as! SKView
             skView.showsFPS = true
@@ -24,14 +31,22 @@ class GameViewController: UIViewController {
             skView.ignoresSiblingOrder = true
             
             /* Set the scale mode to scale to fit the window */
-            scene.scaleMode = .AspectFill
+            gameScene!.scaleMode = .AspectFill
             
-            skView.presentScene(scene)
-        }
+            skView.presentScene(gameScene)
+        //}
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Release any cached data, images, etc that aren't in use.
+    }
+    
+    override func pressesBegan(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
+        gameScene!.pressesBegan(presses, withEvent: event)
+    }
+    
+    override func pressesEnded(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
+        gameScene!.pressesEnded(presses, withEvent: event)
     }
 }
