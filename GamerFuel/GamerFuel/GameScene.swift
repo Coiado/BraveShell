@@ -26,10 +26,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //MARK: - properties
     var hero: SKSpriteNode?
     var crosshair: SKSpriteNode?
+    var background:SKSpriteNode?
     var bgImage: SKSpriteNode?
     var floor:SKSpriteNode?
     var startTime:NSDate?
     var endDate:NSDate?
+    
+    var healthLbl:SKLabelNode?
+    var pointsLbl:SKLabelNode?
+    var gameOverLabel:SKLabelNode?
+    
+    var health = 100
+    
+    var gameOver = false
+    var isJumping = false
+    var enemyContact = false
     
     var numOfPoints:Int = 0
     
@@ -37,15 +48,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
         
-        var background = SKSpriteNode(imageNamed: "back_placeholder")
-        background.position = CGPointMake(self.size.width/2, self.size.height/2);
-        self.addChild(background)
+        self.createBacground()
         
+        self.healthLbl = SKLabelNode(fontNamed: "Arial")
+        self.healthLbl?.text = "HEALTH: \(health)"
+        self.healthLbl?.position = CGPointMake(self.frame.width * 0.9, self.frame.height * 0.95)
+        self.healthLbl?.fontSize = 20
+        self.addChild(healthLbl!)
+        
+        self.pointsLbl = SKLabelNode(fontNamed: "Arial")
+        self.pointsLbl?.text = "POINTS: \(numOfPoints)"
+        self.pointsLbl?.position = CGPointMake(self.frame.width * 0.1, self.frame.height * 0.95)
+        self.pointsLbl?.fontSize = 20
+        self.addChild(pointsLbl!)
         
         
         self.createHero()
         self.createCrosshair()
-        
         
         print(self.view?.frame.width)
         
@@ -63,11 +82,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         //crosshair config
         self.crosshairMoviment(self.crosshair!)
         
-
-        
-        //set controller
-        self.setControllersEvents()
-        
         
         runAction(SKAction.repeatActionForever(
             SKAction.sequence([
@@ -84,8 +98,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         /* Called when a touch begins */
         
-        //print("touch")
-        self.jumpPlayer()
+
+        
+        if gameOver{
+            self.restartTheGame()
+        }
     }
    
     //MARK: - Screen update
@@ -99,6 +116,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 self.updateEnemy(enemy)
             }
         }
+        self.updatePoints()
+        
+        
+    }
+    
+    func createBacground(){
+        background = SKSpriteNode(imageNamed: "back_placeholder")
+        background!.position = CGPointMake(self.size.width/2, self.size.height/2);
+        self.addChild(background!)
+        print("BACKGROUND")
+        
     }
     
     
@@ -111,8 +139,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func createHero(){
         
         hero = SKSpriteNode(imageNamed: "fulero_placeholder")
-        hero!.xScale = 0.1
-        hero!.yScale = 0.1
+        hero!.xScale = 0.05
+        hero!.yScale = 0.05
         hero!.position = CGPoint(x: CGRectGetMidX(self.frame), y: (CGRectGetMinY(self.frame) + CGRectGetMaxY(hero!.frame)  ) )
         hero!.physicsBody = SKPhysicsBody(rectangleOfSize: hero!.size)
         hero!.physicsBody?.usesPreciseCollisionDetection = true
@@ -129,6 +157,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         hero?.physicsBody?.dynamic = true
         hero!.name = "hero"
         self.addChild(hero!)
+        print("HERO")
+
+        
 
         
     }
@@ -138,11 +169,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func createCrosshair(){
         
         self.crosshair = SKSpriteNode(imageNamed: "Spaceship")
-        crosshair!.xScale = 0.2
-        crosshair!.yScale = 0.2
-        crosshair!.position = CGPoint(x: CGRectGetMinX(hero!.frame)/50, y: (CGRectGetMaxY(hero!.frame)+50))
+        crosshair!.xScale = 0.7
+        crosshair!.yScale = 0.7
+        crosshair!.position = CGPoint(x: CGRectGetMinX(hero!.frame)/50, y: (CGRectGetMaxY(hero!.frame)+200))
         crosshair!.name = "small"
         hero!.addChild(crosshair!)
+        print("CROSSHAIR")
+
 
     }
     
@@ -154,12 +187,31 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func random(min min: CGFloat, max: CGFloat) -> CGFloat {
         return random() * (max - min) + min
     }
+    
+    func randomInRange(low: CGFloat, high: CGFloat) -> CGFloat {
+        let value = CGFloat(arc4random_uniform(UINT32_MAX)) / CGFloat(UINT32_MAX)
+        return value * (high - low) + low
+    }
+
+    func radiansToVector(radians: CGFloat) -> CGVector {
+        return CGVector(dx: cos(radians), dy: sin(radians))
+    }
+
 
     /**
      add an enemy on the screen
      */
     func addEnemy(){
-        let enemy = SKSpriteNode(imageNamed: "Spaceship")
+        let kCCHaloLowAngle : CGFloat  = (200.0 * 3.14) / 180.0;
+        let kCCHaloHighAngle : CGFloat  = (340.0 * 3.14) / 180.0;
+        let kCCHaloSpeed: CGFloat = 100.0;
+        
+        
+        let enemy = SKSpriteNode(imageNamed: "minioneagle_placeholder")
+        
+         let direction : CGVector  = radiansToVector(randomInRange(kCCHaloLowAngle, high: kCCHaloHighAngle));
+        
+        enemy.physicsBody?.velocity = CGVectorMake(direction.dx * kCCHaloSpeed, direction.dy * kCCHaloSpeed)
         
         enemy.xScale = 0.1
         enemy.yScale = 0.1
@@ -170,17 +222,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         enemy.physicsBody?.collisionBitMask = PhysicsCategories.Hero
         enemy.name = "enemy"
         
-        //it needs to be improved
         let actualX = random(min: enemy.size.width/2, max: size.width - enemy.size.height)
         
-        enemy.position = CGPoint(x:actualX,  y: size.height + enemy.size.height/2)
         
+        enemy.position = CGPointMake(random(min: enemy.size.width * 0.5, max: self.size.width - (enemy.size.width * 0.5)), self.size.height + (enemy.size.height * 0.5))
         addChild(enemy)
         
         let actualDuration = random(min: CGFloat(5), max: CGFloat(10.0))
         
         let actionMove = SKAction.moveTo(CGPoint(x: actualX, y: -10), duration: NSTimeInterval(actualDuration))
-        let actionMoveDone = SKAction.removeFromParent()
+        //let actionMoveDone = SKAction.removeFromParent()
         enemy.runAction(SKAction.sequence([actionMove]))
 
     }
@@ -196,142 +247,101 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         node.runAction(firstMoviment, withKey:"firstMovment")
         node.runAction(action,withKey:"crosshairAction")
         
-        
-
     }
     
-    //MARK: - Controller events mehtods
+
     
-    func setControllersEvents(){
-        let swipeRight:UISwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(GameScene.swipedRight(_:)))
-        swipeRight.direction = .Right
-        view!.addGestureRecognizer(swipeRight)
+    
+    
+    //Low level press events
+    override func pressesBegan(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
         
+        if gameOver == false {
+            for item in presses {
+                
+                if item.type == .PlayPause{
+                    print("pressed")
+                    self.startTime = NSDate()
+                    crosshair?.removeAllActions()
+                    
+                }
+            }
+
+        }
+    }
+    
+    
+    override func pressesEnded(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
         
-        let swipeLeft:UISwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(GameScene.swipedLeft(_:)))
-        swipeLeft.direction = .Left
-        view!.addGestureRecognizer(swipeLeft)
-        
-        
-        let swipeUp:UISwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(GameScene.swipedUp(_:)))
-        swipeUp.direction = .Up
-        view!.addGestureRecognizer(swipeUp)
-        
-        
-        let swipeDown:UISwipeGestureRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(GameScene.swipedDown(_:)))
-        swipeDown.direction = .Down
-        view!.addGestureRecognizer(swipeDown)
-        
-        
+        if gameOver == false {
+            
+            for item in presses {
+                if item.type == UIPressType.PlayPause {
+                    self.endDate = NSDate()
+                    let timePressed = CFDateGetTimeIntervalSinceDate(endDate, startTime)
+                    
+                    if isJumping == false {
+                        
+                        if timePressed < 0.2 {
+                            self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
+                            self.jump((self.frame.height) * 0.3)
+                        }else
+                            if timePressed > 0.5 {
+                                self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
+                                self.jump((self.frame.height) * 0.8)
+                                
+                            }else {
+                                self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
+                                self.jump((self.frame.height) * 0.2)
+                        }
+                        
+                    }
+                    
+                    print("released\(timePressed)")
+                    self.crosshair?.zRotation = 0.0
+                    self.crosshair?.zPosition = 0.0
+                    
+                    
+                    self.crosshairMoviment(crosshair!)
+                    
+                }
+            }
+            
+        }
 
     }
     
     //MARK:- impulse action
-    func jumpPlayer() {
-        // 1
-        let impulse =  CGVector(dx: 0, dy: 75)
-        // 2
-        hero!.physicsBody?.applyImpulse(impulse)
-    }
 
-    
-    
-    // Handle Swipe Events
-    func swipedRight(sender:UISwipeGestureRecognizer){
-        hero!.position = CGPoint(x: hero!.position.x + 10, y: hero!.position.y)
-    }
-    
-    func swipedLeft(sender:UISwipeGestureRecognizer){
-        hero!.position = CGPoint(x: (hero!.position.x - 10), y: hero!.position.y)
-    }
-    
-    func swipedUp(sender:UISwipeGestureRecognizer){
-        hero!.position = CGPoint(x: hero!.position.x, y: hero!.position.y+10)
-    }
-    
-    func swipedDown(sender:UISwipeGestureRecognizer){
-        hero!.position = CGPoint(x: hero!.position.x, y: hero!.position.y-10)
-    }
-    
-    func tapped(sender:UITapGestureRecognizer){
-        print("play/Pause pressed")
+    /**
+     Perform a jump in  scree
+     
+     - parameter yAxis: CGFloat
+     */
+    func jump(yAxis:CGFloat){
+        let cross = self.childNodeWithName("small")
+        isJumping = true
         
+        let xDirection = CGFloat(((crosshair!.zRotation * 180)/CGFloat(M_PI)) * (-1))
         // move up 20
-        let jumpUpAction = SKAction.moveByX(CGFloat(((crosshair!.zRotation * 180)/CGFloat(M_PI)) * (-1)),y:40, duration: 0.2)
+        //let jumpUpAction = SKAction.moveByX(CGFloat(((crosshair!.zRotation * 180)/CGFloat(M_PI)) * (-1)),y:yAxis, duration: 0.5)
         // move down 20
-        let jumpDownAction = SKAction.moveByX(CGFloat(((crosshair!.zRotation * 180)/CGFloat(M_PI)) * (-1)), y: -40,duration:0.2)
+        //let jumpDownAction = SKAction.moveByX(CGFloat(((crosshair!.zRotation * 180)/CGFloat(M_PI)) * (-1)), y: -1 * yAxis,duration:0.8)
+        
+        let jumpUpAction = SKAction.moveByX(xDirection,y:yAxis, duration: 0.5)
+        let jumpDownAction = SKAction.moveByX(xDirection,y: -1 * 0, duration: 0.5)
         
         // sequence of move yup then down
         let jumpSequence = SKAction.sequence([jumpUpAction, jumpDownAction])
         
         // make player run sequence
         hero!.runAction(jumpSequence)
-    }
-    
-    
-    //Low level press events
-    override func pressesBegan(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
-        for item in presses {
-
-            if item.type == .PlayPause{
-                print("pressed")
-                self.startTime = NSDate()
-                //self.removeActionForKey("crosshairAction")
-                crosshair?.removeAllActions()
-                
-            }
-        }
-    }
-    
-    func jump(yAxis:CGFloat){
-        let cross = self.childNodeWithName("small")
-        
-        print("cross \(cross)")
-        // move up 20
-        let jumpUpAction = SKAction.moveByX(CGFloat(((crosshair!.zRotation * 180)/CGFloat(M_PI)) * (-1)),y:yAxis, duration: 0.5)
-        // move down 20
-        let jumpDownAction = SKAction.moveByX(CGFloat(((crosshair!.zRotation * 180)/CGFloat(M_PI)) * (-1)), y: -1 * yAxis,duration:0.8)
-        
-        // sequence of move yup then down
-        let jumpSequence = SKAction.sequence([jumpUpAction,jumpDownAction])
-        
-        // make player run sequence
-        hero!.runAction(jumpSequence)
 
         
     }
     
-    override func pressesEnded(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
-        for item in presses {
-            if item.type == UIPressType.PlayPause {
-                //self.view!.backgroundColor = UIColor.whiteColor()
-                self.endDate = NSDate()
-                let timePressed = CFDateGetTimeIntervalSinceDate(endDate, startTime)
-                if timePressed < 0.2 {
-                    self.physicsWorld.gravity = CGVector(dx: 0, dy: -2.8)
-                    self.jump((self.frame.height) * 0.3)
-                }else
-                if timePressed > 0.5 {
-                    self.physicsWorld.gravity = CGVector(dx: 0, dy: -2.8)
-                    self.jump((self.frame.height) * 0.8)
 
-                }else {
-                    self.physicsWorld.gravity = CGVector(dx: 0, dy: -2.8)
-                    self.jump((self.frame.height) * 0.2)
-                }
-                
-                print("released\(timePressed)")
-                self.crosshair?.zRotation = 0.0
-                self.crosshair?.zPosition = 0.0
-                
-                
-                self.crosshairMoviment(crosshair!)
-            
-            }
-        }
-    }
-    
-    
+
     
     
     //MARK: - Colision detect
@@ -349,11 +359,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0) && ((secondBody.categoryBitMask & PhysicsCategories.floor) != 0) {
             print("HIT THE FLOOR")
-            //self.hero?.position.y = (self.hero?.size.height)! + 20
+            isJumping = false
+
             
         }else if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0 && ((secondBody.categoryBitMask & PhysicsCategories.Enemy) != 0)) {
             self.removeEnemy(secondBody.node as! SKSpriteNode)
             print("HIT AN ENEMY")
+            if gameOver == false{
+                self.numOfPoints += 20
+                self.enemyContact = true
+
+            }
         }
     }
     
@@ -366,11 +382,58 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         if enemy.position.y < 0 {
             
-            enemy.removeFromParent()
-            numOfPoints += 1
+            if gameOver == false {
+                enemy.removeFromParent()
+                health -= 10
+                self.healthLbl?.text = "HEALTH: \(health)"
+                
+            }
             
-            print("NUMBER OF POINTS \(numOfPoints)")
+            if health == 0 {
+                gameOver = true
+                self.isGameOver()
+                enemy.removeFromParent()
+            }
+            
         }
+    }
+    
+    func updatePoints(){
+        if enemyContact {
+            self.pointsLbl?.text = "POINTS: \(numOfPoints)"
+        }
+    }
+    
+    /**
+     ends the game
+     */
+    func isGameOver(){
+        self.gameOverLabel?.removeFromParent()
+
+        self.gameOver = true
+        self.gameOverLabel = SKLabelNode(fontNamed: "Arial")
+        self.gameOverLabel?.text = " GAME OVER"
+        self.gameOverLabel?.position = CGPointMake(CGRectGetMidX(self.frame), CGRectGetMidY(self.frame))
+        self.gameOverLabel?.fontSize = 20
+        self.addChild(gameOverLabel!)
+
+    }
+    /**
+     Restart all the stats of game
+     */
+    func restartTheGame(){
+        self.gameOver = false
+        self.health = 100
+        self.numOfPoints = 0
+        self.healthLbl?.text = "HEALTH: \(health)"
+        self.gameOverLabel?.removeFromParent()
+        
+        //get all the nodes with the same type
+        enumerateChildNodesWithName("enemy") { (enemy, _) in
+            enemy.removeFromParent()
+        }
+        
+        
     }
 
     
