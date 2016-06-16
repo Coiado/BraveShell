@@ -138,7 +138,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      */
     func createHero(){
         
-        hero = SKSpriteNode(imageNamed: "fulero_placeholder")
+        hero = SKSpriteNode(imageNamed: "fulero_withoutborders.placeholder")
         hero!.xScale = 0.05
         hero!.yScale = 0.05
         hero!.position = CGPoint(x: CGRectGetMidX(self.frame), y: (CGRectGetMinY(self.frame) + CGRectGetMaxY(hero!.frame)  ) )
@@ -169,9 +169,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func createCrosshair(){
         
         self.crosshair = SKSpriteNode(imageNamed: "Spaceship")
-        crosshair!.xScale = 0.7
-        crosshair!.yScale = 0.7
-        crosshair!.position = CGPoint(x: CGRectGetMinX(hero!.frame)/50, y: (CGRectGetMaxY(hero!.frame)+200))
+        crosshair!.xScale = 0.9
+        crosshair!.yScale = 0.9
+        crosshair!.position = CGPoint(x: hero!.frame.width * 0.5, y: hero!.frame.height * 15)
         crosshair!.name = "small"
         hero!.addChild(crosshair!)
         print("CROSSHAIR")
@@ -282,24 +282,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     
                     if isJumping == false {
                         
+                        
                         if timePressed < 0.2 {
                             self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
-                            self.jump((self.frame.height) * 0.3)
+                            self.jump(60)
                         }else
                             if timePressed > 0.5 {
                                 self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
-                                self.jump((self.frame.height) * 0.8)
+                                self.jump(75)
                                 
                             }else {
                                 self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
-                                self.jump((self.frame.height) * 0.2)
+                                self.jump(30)
                         }
+
+
                         
                     }
                     
                     print("released\(timePressed)")
                     self.crosshair?.zRotation = 0.0
                     self.crosshair?.zPosition = 0.0
+                    
                     
                     
                     self.crosshairMoviment(crosshair!)
@@ -318,24 +322,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      
      - parameter yAxis: CGFloat
      */
-    func jump(yAxis:CGFloat){
-        let cross = self.childNodeWithName("small")
+    func jump(velocity:CGFloat){
         isJumping = true
+        print(crosshair!.zRotation)
+        let direction = crosshair!.zRotation - CGFloat(M_PI)/2
         
-        let xDirection = CGFloat(((crosshair!.zRotation * 180)/CGFloat(M_PI)) * (-1))
-        // move up 20
-        //let jumpUpAction = SKAction.moveByX(CGFloat(((crosshair!.zRotation * 180)/CGFloat(M_PI)) * (-1)),y:yAxis, duration: 0.5)
-        // move down 20
-        //let jumpDownAction = SKAction.moveByX(CGFloat(((crosshair!.zRotation * 180)/CGFloat(M_PI)) * (-1)), y: -1 * yAxis,duration:0.8)
         
-        let jumpUpAction = SKAction.moveByX(xDirection,y:yAxis, duration: 0.5)
-        let jumpDownAction = SKAction.moveByX(xDirection,y: -1 * 0, duration: 0.5)
-        
-        // sequence of move yup then down
-        let jumpSequence = SKAction.sequence([jumpUpAction, jumpDownAction])
-        
-        // make player run sequence
-        hero!.runAction(jumpSequence)
+        hero!.physicsBody?.velocity = CGVector(dx: velocity * -cos(direction) * 10, dy: velocity * -sin(direction) * 10)
 
         
     }
@@ -360,6 +353,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0) && ((secondBody.categoryBitMask & PhysicsCategories.floor) != 0) {
             print("HIT THE FLOOR")
             isJumping = false
+            hero!.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
 
             
         }else if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0 && ((secondBody.categoryBitMask & PhysicsCategories.Enemy) != 0)) {
