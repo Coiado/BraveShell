@@ -13,6 +13,7 @@ class GameViewController: UIViewController {
     
     let gameScene = GameScene(fileNamed: "GameScene")
     //var gameScene: GameScene?
+    var menu:MenuScene?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,6 +48,7 @@ class GameViewController: UIViewController {
         super.viewWillLayoutSubviews()
 
 
+        menu = MenuScene(size: view.bounds.size)
         // Configure the view.
         let skView = self.view as! SKView
         skView.showsFPS = true
@@ -68,7 +70,9 @@ class GameViewController: UIViewController {
 
     
     override func pressesBegan(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
+        
         gameScene!.pressesBegan(presses, withEvent: event)
+        
     }
     
     override func pressesEnded(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {

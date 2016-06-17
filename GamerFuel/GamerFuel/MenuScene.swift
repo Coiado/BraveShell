@@ -46,4 +46,11 @@ class MenuScene: SKScene {
         let transition = SKTransition.fadeWithDuration(0.15)
         view!.presentScene(gameScene, transition: transition)
     }
+    
+    override func pressesBegan(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
+        print("PRESS MENU")
+    }
+    override func pressesEnded(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
+        print("END PRESS MENU")
+    }
 }

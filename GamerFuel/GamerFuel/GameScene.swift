@@ -41,6 +41,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var gameOver = false
     var isJumping = false
     var enemyContact = false
+    var hitTheFloor = true
     
     var numOfPoints:Int = 0
     
@@ -89,7 +90,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 SKAction.waitForDuration(4.0)
                 ])
             ))
-
     }
     
     
@@ -158,8 +158,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         hero!.name = "hero"
         self.addChild(hero!)
         print("HERO")
-
-        
 
         
     }
@@ -263,7 +261,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     print("pressed")
                     self.startTime = NSDate()
                     crosshair?.removeAllActions()
-                    
                 }
             }
 
@@ -285,25 +282,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         
                         if timePressed < 0.2 {
                             self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
-                            self.jump(60)
+                            self.jump(90)
+                            self.hitTheFloor = false
                         }else
                             if timePressed > 0.5 {
                                 self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
-                                self.jump(75)
+                                self.jump(120)
+                                self.hitTheFloor = false
                                 
                             }else {
                                 self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
-                                self.jump(30)
+                                self.jump(60)
+                                self.hitTheFloor = false
                         }
 
-
-                        
                     }
                     
                     print("released\(timePressed)")
                     self.crosshair?.zRotation = 0.0
                     self.crosshair?.zPosition = 0.0
-                    
                     
                     
                     self.crosshairMoviment(crosshair!)
@@ -327,6 +324,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         print(crosshair!.zRotation)
         let direction = crosshair!.zRotation - CGFloat(M_PI)/2
         
+        self.emiterFromJump(hero!.position)
         
         hero!.physicsBody?.velocity = CGVector(dx: velocity * -cos(direction) * 10, dy: velocity * -sin(direction) * 10)
 
@@ -354,15 +352,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             print("HIT THE FLOOR")
             isJumping = false
             hero!.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+            self.hitTheFloor = true
 
             
         }else if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0 && ((secondBody.categoryBitMask & PhysicsCategories.Enemy) != 0)) {
-            self.removeEnemy(secondBody.node as! SKSpriteNode)
+            
             print("HIT AN ENEMY")
             if gameOver == false{
                 self.numOfPoints += 20
                 self.enemyContact = true
+                self.explosion((secondBody.node as! SKSpriteNode).position)
+                self.removeEnemy(secondBody.node as! SKSpriteNode)
 
+            }else{
+                self.removeEnemy(secondBody.node as! SKSpriteNode)
             }
         }
     }
@@ -428,6 +431,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         
         
+    }
+    
+    func explosion(pos: CGPoint) {
+        let emitterNode = SKEmitterNode(fileNamed: "ExplosionParticle.sks")
+        emitterNode!.particlePosition = pos
+        self.addChild(emitterNode!)
+        // Don't forget to remove the emitter node after the explosion
+        self.runAction(SKAction.waitForDuration(2), completion: { emitterNode!.removeFromParent() })
+        
+    }
+    
+    func emiterFromJump(pos:CGPoint){
+        let emitterNode = SKEmitterNode(fileNamed: "JumpSmoke.sks")
+        emitterNode!.particlePosition = pos
+        self.addChild(emitterNode!)
+        // Don't forget to remove the emitter node after the jump
+        self.runAction(SKAction.waitForDuration(2), completion: { emitterNode!.removeFromParent() })
     }
 
     

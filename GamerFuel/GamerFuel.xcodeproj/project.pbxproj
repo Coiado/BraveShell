@@ -20,6 +20,10 @@
 		6B47AD391D099A6200910647 /* GamerFuelUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B47AD381D099A6200910647 /* GamerFuelUITests.swift */; };
 		6B47AD491D099F3C00910647 /* VirtualGameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B47AD481D099F3C00910647 /* VirtualGameController.framework */; };
 		6B47AD4A1D099F3C00910647 /* VirtualGameController.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B47AD481D099F3C00910647 /* VirtualGameController.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6BA234931D142C0A00393A22 /* ExplosionParticle.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6BA234911D142C0A00393A22 /* ExplosionParticle.sks */; };
+		6BA234941D142C0A00393A22 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BA234921D142C0A00393A22 /* spark.png */; };
+		6BA234981D142E9B00393A22 /* JumpSmoke.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6BA234961D142E9B00393A22 /* JumpSmoke.sks */; };
+		6BA234991D142E9B00393A22 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BA234971D142E9B00393A22 /* spark.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +77,10 @@
 		6B47AD3A1D099A6200910647 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6B47AD461D099F2D00910647 /* VirtualGameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VirtualGameController.framework; path = Carthage/Build/tvOS/VirtualGameController.framework; sourceTree = "<group>"; };
 		6B47AD481D099F3C00910647 /* VirtualGameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VirtualGameController.framework; path = Carthage/Build/tvOS/VirtualGameController.framework; sourceTree = "<group>"; };
+		6BA234911D142C0A00393A22 /* ExplosionParticle.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; name = ExplosionParticle.sks; path = ../ExplosionParticle.sks; sourceTree = "<group>"; };
+		6BA234921D142C0A00393A22 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spark.png; path = ../spark.png; sourceTree = "<group>"; };
+		6BA234961D142E9B00393A22 /* JumpSmoke.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = JumpSmoke.sks; sourceTree = "<group>"; };
+		6BA234971D142E9B00393A22 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +134,7 @@
 		6B47AD141D099A6200910647 /* GamerFuel */ = {
 			isa = PBXGroup;
 			children = (
+				6BA234951D142E7600393A22 /* Emiters */,
 				6B47AD151D099A6200910647 /* AppDelegate.swift */,
 				6B47AD171D099A6200910647 /* GameScene.sks */,
 				6B47AD191D099A6200910647 /* GameScene.swift */,
@@ -156,6 +165,17 @@
 				6B47AD3A1D099A6200910647 /* Info.plist */,
 			);
 			path = GamerFuelUITests;
+			sourceTree = "<group>";
+		};
+		6BA234951D142E7600393A22 /* Emiters */ = {
+			isa = PBXGroup;
+			children = (
+				6BA234921D142C0A00393A22 /* spark.png */,
+				6BA234911D142C0A00393A22 /* ExplosionParticle.sks */,
+				6BA234961D142E9B00393A22 /* JumpSmoke.sks */,
+				6BA234971D142E9B00393A22 /* spark.png */,
+			);
+			name = Emiters;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -264,10 +284,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B47AD211D099A6200910647 /* Main.storyboard in Resources */,
+				6BA234991D142E9B00393A22 /* spark.png in Resources */,
 				6B47AD181D099A6200910647 /* GameScene.sks in Resources */,
 				6B47AD231D099A6200910647 /* Assets.xcassets in Resources */,
+				6BA234941D142C0A00393A22 /* spark.png in Resources */,
 				6B3EAF801D12C604005E4079 /* Menu.sks in Resources */,
 				6B47AD1E1D099A6200910647 /* Game.xcassets in Resources */,
+				6BA234931D142C0A00393A22 /* ExplosionParticle.sks in Resources */,
+				6BA234981D142E9B00393A22 /* JumpSmoke.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
