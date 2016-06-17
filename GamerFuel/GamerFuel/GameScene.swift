@@ -42,6 +42,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var isJumping = false
     var enemyContact = false
     var hitTheFloor = true
+    var isPressed = false
+    
+    var timer:NSTimer?
     
     var numOfPoints:Int = 0
     
@@ -109,6 +112,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
         
+        
+        
      
         
         enumerateChildNodesWithName("enemy") { (enemy, _) in
@@ -117,7 +122,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
         self.updatePoints()
-        
+        self.crosshairScaleUpdate()
         
     }
     
@@ -200,19 +205,34 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      add an enemy on the screen
      */
     func addEnemy(){
+        //Add textures
+        let enemy1 = SKTexture(imageNamed: "minioneagle.1")
+        enemy1.filteringMode = SKTextureFilteringMode.Nearest
+        let enemy2 = SKTexture(imageNamed: "minioneagle.2")
+        enemy2.filteringMode = SKTextureFilteringMode.Nearest
+        let enemy3 = SKTexture(imageNamed: "minioneagle.3")
+        enemy3.filteringMode = SKTextureFilteringMode.Nearest
+        let enemy4 = SKTexture(imageNamed: "minioneagle.4")
+        enemy4.filteringMode = SKTextureFilteringMode.Nearest
+        
+        let flap = SKAction.repeatActionForever(SKAction.animateWithTextures([enemy1,enemy2,enemy3,enemy4,enemy3,enemy2,enemy1], timePerFrame: 0.2))
+
+
+
+        
         let kCCHaloLowAngle : CGFloat  = (200.0 * 3.14) / 180.0;
         let kCCHaloHighAngle : CGFloat  = (340.0 * 3.14) / 180.0;
         let kCCHaloSpeed: CGFloat = 100.0;
         
         
-        let enemy = SKSpriteNode(imageNamed: "minioneagle_placeholder")
+        let enemy = SKSpriteNode(texture: enemy1)
         
          let direction : CGVector  = radiansToVector(randomInRange(kCCHaloLowAngle, high: kCCHaloHighAngle));
         
         enemy.physicsBody?.velocity = CGVectorMake(direction.dx * kCCHaloSpeed, direction.dy * kCCHaloSpeed)
         
-        enemy.xScale = 0.1
-        enemy.yScale = 0.1
+        enemy.xScale = 0.3
+        enemy.yScale = 0.3
         enemy.physicsBody = SKPhysicsBody(rectangleOfSize: enemy.size)
         enemy.physicsBody?.dynamic = false
         enemy.physicsBody?.categoryBitMask = PhysicsCategories.Enemy
@@ -231,19 +251,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let actionMove = SKAction.moveTo(CGPoint(x: actualX, y: -10), duration: NSTimeInterval(actualDuration))
         //let actionMoveDone = SKAction.removeFromParent()
         enemy.runAction(SKAction.sequence([actionMove]))
+        enemy.runAction(flap)
 
     }
     
     //MARK - Crosshair movient
     func crosshairMoviment(node:SKSpriteNode){
-        let firstMoviment = SKAction.rotateByAngle(CGFloat(M_PI_2), duration: 1)
-        let clockWiseMoviment = SKAction.rotateByAngle(CGFloat(2 * (-M_PI_2)), duration: 1)
-        let antiClockWiseMoviment = SKAction.rotateByAngle(CGFloat(2 * (M_PI_2)), duration: 1)
+        let firstMoviment = SKAction.rotateByAngle(1.39626, duration: 1)
+            //SKAction.rotateByAngle(CGFloat(M_PI_2 - 1.3), duration: 1)
+        let clockWiseMoviment = SKAction.rotateByAngle(-2.96706, duration: 1)
+            //SKAction.rotateByAngle(CGFloat(2 * (-M_PI_2)), duration: 1)
+        let antiClockWiseMoviment = SKAction.rotateByAngle(2.96706, duration: 1)
+            //SKAction.rotateByAngle(CGFloat(2 * (M_PI_2)), duration: 1)
         
         let action = SKAction.repeatActionForever(SKAction.sequence([clockWiseMoviment,antiClockWiseMoviment]))
         
         node.runAction(firstMoviment, withKey:"firstMovment")
         node.runAction(action,withKey:"crosshairAction")
+        
         
     }
     
@@ -253,7 +278,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     //Low level press events
     override func pressesBegan(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
-        
+        self.isPressed  = true
+
         if gameOver == false {
             for item in presses {
                 
@@ -261,6 +287,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     print("pressed")
                     self.startTime = NSDate()
                     crosshair?.removeAllActions()
+                    
                 }
             }
 
@@ -268,8 +295,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     
+    
+    
     override func pressesEnded(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
         
+        self.isPressed = false
         if gameOver == false {
             
             for item in presses {
@@ -282,20 +312,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         
                         if timePressed < 0.2 {
                             self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
-                            self.jump(90)
                             self.hitTheFloor = false
+                            self.jump(90)
+
                         }else
                             if timePressed > 0.5 {
                                 self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
-                                self.jump(120)
                                 self.hitTheFloor = false
-                                
+                                self.jump(120)
+
+
                             }else {
                                 self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
-                                self.jump(60)
                                 self.hitTheFloor = false
+                                self.jump(60)
+
+
                         }
 
+                    }else if isJumping == true {
+                        print("Impulsing")
+                        self.impulse(60)
+                        
                     }
                     
                     print("released\(timePressed)")
@@ -327,8 +365,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.emiterFromJump(hero!.position)
         
         hero!.physicsBody?.velocity = CGVector(dx: velocity * -cos(direction) * 10, dy: velocity * -sin(direction) * 10)
-
         
+        self.crosshair?.hidden = true
+
+    }
+    
+    func impulse(velocity:CGFloat){
+        
+        print(crosshair!.zRotation)
+        let direction = crosshair!.zRotation - CGFloat(M_PI)/2
+        
+        self.emiterFromJump(hero!.position)
+        
+        hero!.physicsBody?.velocity = CGVector(dx:0, dy: velocity * -sin(direction) * 10)
+
     }
     
 
@@ -353,6 +403,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             isJumping = false
             hero!.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
             self.hitTheFloor = true
+            self.crosshair?.hidden = false
+            self.crosshair?.yScale = 0.9
+            self.crosshair?.xScale = 0.9
 
             
         }else if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0 && ((secondBody.categoryBitMask & PhysicsCategories.Enemy) != 0)) {
@@ -449,6 +502,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // Don't forget to remove the emitter node after the jump
         self.runAction(SKAction.waitForDuration(2), completion: { emitterNode!.removeFromParent() })
     }
+    
+    func changeCrosshairScale(){
+        let xScale = crosshair!.xScale
+        let yScale = crosshair!.yScale
+        
+        if xScale < 2.0 {
+            crosshair?.xScale = xScale + 0.1
+            crosshair?.yScale = yScale + 0.1
+        }
+        
+    }
+    
+    func crosshairScaleUpdate(){
+//        
+//        if isPressed {
+//            self.crosshairScaleUpdate()
+//        }
+    }
+    
+    
 
     
 }
