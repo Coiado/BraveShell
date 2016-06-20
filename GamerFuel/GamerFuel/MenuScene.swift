@@ -25,7 +25,7 @@ class MenuScene: SKScene {
         
         self.backgroundColor = UIColor.whiteColor()
         
-        self.titleLabel = SKLabelNode(fontNamed: "Arial")
+        self.titleLabel = SKLabelNode(fontNamed: "Brandley Hand")
         self.newGameLabel = SKLabelNode(fontNamed: "Arial")
         
         self.titleLabel?.fontSize = 36
@@ -48,6 +48,7 @@ class MenuScene: SKScene {
         playButton.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!),y: CGRectGetMidY((self.scene?.frame)!) - (titleLabel?.frame.height)!)
         self.playButton.xScale = 0.2
         self.playButton.yScale = 0.2
+        self.playButton.color = UIColor.blueColor()
         self.addChild(playButton)
         
         
@@ -84,7 +85,6 @@ class MenuScene: SKScene {
     
     override func pressesBegan(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
         
-        print("NADA")
     }
     
     override func pressesEnded(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {

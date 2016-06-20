@@ -15,7 +15,7 @@ import GameController
 struct PhysicsCategories {
     static let Hero      :UInt32 = 0x1 << 0
     static let Crosshair :UInt32 = 0x1 << 1
-    static let None      :UInt32 = 0x1 << 2
+    static let Boss      :UInt32 = 0x1 << 2
     static let Enemy     :UInt32 = 0x1 << 3
     static let floor     :UInt32 = 0x1 << 4
 }
@@ -28,6 +28,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var crosshair: SKSpriteNode?
     var background:SKSpriteNode?
     var bgImage: SKSpriteNode?
+    var bossEnemy:SKSpriteNode?
     var floor:SKSpriteNode?
     var startTime:NSDate?
     var endDate:NSDate?
@@ -43,10 +44,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var enemyContact = false
     var hitTheFloor = true
     var isPressed = false
+    var bossIsPresent = false
     
     var timer:NSTimer?
     
     var numOfPoints:Int = 0
+    var bossHealth = 0
     
     //Life cycle view
     override func didMoveToView(view: SKView) {
@@ -92,7 +95,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 SKAction.runBlock(addEnemy),
                 SKAction.waitForDuration(4.0)
                 ])
-            ))
+            ), withKey: "addEnemy")
     }
     
     
@@ -111,6 +114,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //MARK: - Screen update
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
+        
+        if numOfPoints % 20 == 0 && numOfPoints > 0 && bossIsPresent != true {
+            self.addBoss()
+        }
         
         
         
@@ -243,7 +250,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let actualX = random(min: enemy.size.width/2, max: size.width - enemy.size.height)
         
         
-        enemy.position = CGPointMake(random(min: enemy.size.width * 0.5, max: self.size.width - (enemy.size.width * 0.5)), self.size.height + (enemy.size.height * 0.5))
+        //enemy.position = CGPointMake(random(min: enemy.size.width * 0.5, max: self.size.width - (enemy.size.width * 0.5)), self.size.height + (enemy.size.height * 0.5))
+        enemy.position = CGPointMake(randomInRange(enemy.size.width * 0.5, high: self.size.width - (enemy.size.width * 0.5)), self.size.height + (enemy.size.height * 0.5))
         addChild(enemy)
         
         let actualDuration = random(min: CGFloat(5), max: CGFloat(10.0))
@@ -253,6 +261,53 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         enemy.runAction(SKAction.sequence([actionMove]))
         enemy.runAction(flap)
 
+    }
+    
+    func addBoss(){
+        
+        
+        let kCCHaloLowAngle : CGFloat  = (200.0 * 3.14) / 180.0;
+        let kCCHaloHighAngle : CGFloat  = (340.0 * 3.14) / 180.0;
+        let kCCHaloSpeed: CGFloat = 100.0;
+        
+        self.removeActionForKey("addEnemy")
+        self.bossIsPresent = true
+        bossEnemy = SKSpriteNode(imageNamed: "mighty_eagle")
+        bossEnemy?.xScale = 0.3
+        bossEnemy?.yScale = 0.3
+        
+        let direction : CGVector  = radiansToVector(randomInRange(kCCHaloLowAngle, high: kCCHaloHighAngle));
+        
+        bossEnemy!.physicsBody?.velocity = CGVectorMake(direction.dx * kCCHaloSpeed, direction.dy * kCCHaloSpeed)
+        
+        
+        bossEnemy!.physicsBody = SKPhysicsBody(rectangleOfSize: bossEnemy!.size)
+        bossEnemy!.physicsBody?.dynamic = true
+        bossEnemy?.physicsBody?.allowsRotation = false
+        bossEnemy?.physicsBody?.affectedByGravity = false
+        bossEnemy!.physicsBody?.categoryBitMask = PhysicsCategories.Boss
+        bossEnemy!.physicsBody?.contactTestBitMask = PhysicsCategories.Hero
+        bossEnemy!.physicsBody?.collisionBitMask = PhysicsCategories.Hero
+        bossEnemy!.name = "enemy"
+        bossHealth = 3
+        
+        let actualX = random(min: bossEnemy!.size.width/2, max: size.width - bossEnemy!.size.height)
+        
+        
+        //bossEnemy!.position = CGPointMake(random(min: bossEnemy!.size.width * 0.5, max: self.size.width - (bossEnemy!.size.width * 0.5)), self.size.height + (bossEnemy!.size.height * 0.5))
+        bossEnemy!.position = CGPointMake(randomInRange(bossEnemy!.size.width * 0.5, high: self.size.width - (bossEnemy!.size.width * 0.5)), self.size.height + (bossEnemy!.size.height * 0.5))
+        addChild(bossEnemy!)
+        
+        let actualDuration = random(min: CGFloat(90), max: CGFloat(100))
+        
+        let actionMove = SKAction.moveTo(CGPoint(x: actualX, y: -10), duration: NSTimeInterval(actualDuration))
+        //let actionMoveDone = SKAction.removeFromParent()
+        bossEnemy!.runAction(SKAction.sequence([actionMove]))
+
+        
+
+        
+    
     }
     
     //MARK - Crosshair movient
@@ -417,6 +472,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
             }else{
                 self.removeEnemy(secondBody.node as! SKSpriteNode)
+            }
+        }else if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0 && ((secondBody.categoryBitMask & PhysicsCategories.Boss) != 0)){
+            if (bossHealth > 0) {
+                bossHealth -= 1
+            }else{
+                bossEnemy!.removeFromParent()
+                bossIsPresent = false
+                self.numOfPoints += 50
+                runAction(SKAction.repeatActionForever(
+                    SKAction.sequence([
+                        SKAction.runBlock(addEnemy),
+                        SKAction.waitForDuration(4.0)
+                        ])
+                    ), withKey: "addEnemy")
             }
         }
     }
