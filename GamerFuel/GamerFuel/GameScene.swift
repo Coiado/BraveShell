@@ -50,6 +50,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var numOfPoints:Int = 0
     var bossHealth = 0
+    var avaliableImpulse = 2
     
     //Life cycle view
     override func didMoveToView(view: SKView) {
@@ -293,15 +294,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         let actualX = random(min: bossEnemy!.size.width/2, max: size.width - bossEnemy!.size.height)
         
-        
-        //bossEnemy!.position = CGPointMake(random(min: bossEnemy!.size.width * 0.5, max: self.size.width - (bossEnemy!.size.width * 0.5)), self.size.height + (bossEnemy!.size.height * 0.5))
+
         bossEnemy!.position = CGPointMake(randomInRange(bossEnemy!.size.width * 0.5, high: self.size.width - (bossEnemy!.size.width * 0.5)), self.size.height + (bossEnemy!.size.height * 0.5))
         addChild(bossEnemy!)
         
-        let actualDuration = random(min: CGFloat(90), max: CGFloat(100))
+        let actualDuration = random(min: CGFloat(20), max: CGFloat(50))
         
         let actionMove = SKAction.moveTo(CGPoint(x: actualX, y: -10), duration: NSTimeInterval(actualDuration))
-        //let actionMoveDone = SKAction.removeFromParent()
         bossEnemy!.runAction(SKAction.sequence([actionMove]))
 
         
@@ -313,15 +312,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //MARK - Crosshair movient
     func crosshairMoviment(node:SKSpriteNode){
         let firstMoviment = SKAction.rotateByAngle(1.39626, duration: 1)
-            //SKAction.rotateByAngle(CGFloat(M_PI_2 - 1.3), duration: 1)
+        
         let clockWiseMoviment = SKAction.rotateByAngle(-2.96706, duration: 1)
-            //SKAction.rotateByAngle(CGFloat(2 * (-M_PI_2)), duration: 1)
+        
         let antiClockWiseMoviment = SKAction.rotateByAngle(2.96706, duration: 1)
-            //SKAction.rotateByAngle(CGFloat(2 * (M_PI_2)), duration: 1)
         
         let action = SKAction.repeatActionForever(SKAction.sequence([clockWiseMoviment,antiClockWiseMoviment]))
         
         node.runAction(firstMoviment, withKey:"firstMovment")
+        
         node.runAction(action,withKey:"crosshairAction")
         
         
@@ -374,25 +373,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                                 self.hitTheFloor = false
                                 self.jump(120)
 
-
                             }else {
                                 self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
                                 self.hitTheFloor = false
                                 self.jump(60)
-
-
                         }
 
                     }else if isJumping == true {
-                        print("Impulsing")
-                        self.impulse(60)
+                        if avaliableImpulse > 0 {
+                            print("Impulsing")
+                            self.impulse(60)
+                            avaliableImpulse -= 1
+                        }
+                        
+                        
                         
                     }
                     
                     print("released\(timePressed)")
                     self.crosshair?.zRotation = 0.0
                     self.crosshair?.zPosition = 0.0
-                    
                     
                     self.crosshairMoviment(crosshair!)
                     
@@ -434,7 +434,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
     }
     
-
 
     
     
