@@ -9,13 +9,21 @@
 import UIKit
 import SpriteKit
 
-class MenuScene: SKScene {
 
+class MenuScene: SKScene {
+    
+    var playButton = SKSpriteNode()
+    let playButtonTex = SKTexture(imageNamed: "PlayButton")
+    var gScene:GameScene?
+
+    
     
     var titleLabel: SKLabelNode?
     var newGameLabel:SKLabelNode?
     
     override func didMoveToView(view: SKView) {
+        
+        self.backgroundColor = UIColor.whiteColor()
         
         self.titleLabel = SKLabelNode(fontNamed: "Arial")
         self.newGameLabel = SKLabelNode(fontNamed: "Arial")
@@ -29,28 +37,59 @@ class MenuScene: SKScene {
         self.titleLabel?.text = "Tatus Adventure"
         self.newGameLabel?.text = "new game"
         
-        self.titleLabel?.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!) ,y:CGRectGetMidY((self.scene?.frame)!))
-        self.newGameLabel?.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!),y: CGRectGetMidY((self.scene?.frame)!) - (titleLabel?.frame.height)!)
-
+        self.titleLabel?.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!) ,y:CGRectGetMidY((self.scene?.frame)!) - (playButton.frame.height))
+        //self.titleLabel?.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!) ,y:CGRectGetMidY((self.scene?.frame)!))
+        //self.newGameLabel?.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!),y: CGRectGetMidY((self.scene?.frame)!) - (titleLabel?.frame.height)!)
+        
+        
+        self.addChild(titleLabel!)
+        //self.addChild(newGameLabel!)
+        playButton = SKSpriteNode(texture: playButtonTex)
+        playButton.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!),y: CGRectGetMidY((self.scene?.frame)!) - (titleLabel?.frame.height)!)
+        self.playButton.xScale = 0.2
+        self.playButton.yScale = 0.2
+        self.addChild(playButton)
+        
         
     }
+    
+    func createScene(scene:GameScene){
+        self.gScene = scene
+    }
+    
+    
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         
-        self.startGame()
+        if let touch = touches.first  {
+            let pos = touch.locationInNode(self)
+            let node = self.nodeAtPoint(pos)
+            
+            if node == playButton {
+                if let view = self.view {
+                    //let scene = GameScene(fileNamed: "GameScene")
+                    
+                    gScene!.scaleMode = .AspectFit
+                    gScene?.size.width = 1280
+                    gScene?.size.height = 720
 
-    }
-    
-    private func startGame() {
-        let gameScene = GameScene(size: view!.bounds.size)
-        let transition = SKTransition.fadeWithDuration(0.15)
-        view!.presentScene(gameScene, transition: transition)
+                    gScene!.scaleMode = SKSceneScaleMode.AspectFill
+                    view.presentScene(gScene)
+                }
+            }
+        }
+
+        
     }
     
     override func pressesBegan(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
-        print("PRESS MENU")
+        
+        print("NADA")
     }
+    
     override func pressesEnded(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
-        print("END PRESS MENU")
     }
+    
+    
 }
+

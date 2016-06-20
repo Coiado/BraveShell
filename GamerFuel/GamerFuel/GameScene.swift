@@ -171,7 +171,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      */
     func createCrosshair(){
         
-        self.crosshair = SKSpriteNode(imageNamed: "Spaceship")
+        self.crosshair = SKSpriteNode(imageNamed: "crosshair_arrow")
         crosshair!.xScale = 0.9
         crosshair!.yScale = 0.9
         crosshair!.position = CGPoint(x: hero!.frame.width * 0.5, y: hero!.frame.height * 15)
@@ -206,13 +206,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      */
     func addEnemy(){
         //Add textures
-        let enemy1 = SKTexture(imageNamed: "minioneagle.1")
+        let enemy1 = SKTexture(imageNamed: "minion_eagle.1")
         enemy1.filteringMode = SKTextureFilteringMode.Nearest
-        let enemy2 = SKTexture(imageNamed: "minioneagle.2")
+        let enemy2 = SKTexture(imageNamed: "minion_eagle.2")
         enemy2.filteringMode = SKTextureFilteringMode.Nearest
-        let enemy3 = SKTexture(imageNamed: "minioneagle.3")
+        let enemy3 = SKTexture(imageNamed: "minion_eagle.3")
         enemy3.filteringMode = SKTextureFilteringMode.Nearest
-        let enemy4 = SKTexture(imageNamed: "minioneagle.4")
+        let enemy4 = SKTexture(imageNamed: "minion_eagle.4")
         enemy4.filteringMode = SKTextureFilteringMode.Nearest
         
         let flap = SKAction.repeatActionForever(SKAction.animateWithTextures([enemy1,enemy2,enemy3,enemy4,enemy3,enemy2,enemy1], timePerFrame: 0.2))
@@ -278,7 +278,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     //Low level press events
     override func pressesBegan(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
-        self.isPressed  = true
 
         if gameOver == false {
             for item in presses {
@@ -299,7 +298,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func pressesEnded(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
         
-        self.isPressed = false
         if gameOver == false {
             
             for item in presses {
@@ -515,10 +513,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func crosshairScaleUpdate(){
-//        
 //        if isPressed {
 //            self.crosshairScaleUpdate()
 //        }
+
     }
     
     
