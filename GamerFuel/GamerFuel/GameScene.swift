@@ -341,6 +341,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     self.startTime = NSDate()
                     crosshair?.removeAllActions()
                     
+                    self.changeCrosshairScale()
+                    
+                    self.timer = NSTimer.scheduledTimerWithTimeInterval(0.2, target: self, selector: #selector(changeCrosshairScale), userInfo: nil, repeats: true)
+                    timer?.fire()
+                    
                 }
             }
 
@@ -395,6 +400,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     self.crosshair?.zPosition = 0.0
                     
                     self.crosshairMoviment(crosshair!)
+                    timer?.invalidate()
                     
                 }
             }
