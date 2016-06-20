@@ -120,6 +120,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             self.addBoss()
         }
         
+        if bossIsPresent {
+            updateBoss()
+        }
+        
         
         
      
@@ -528,6 +532,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    func updateBoss(){
+        if bossEnemy?.position.y < 0 {
+            if gameOver == false {
+                bossEnemy?.removeFromParent()
+                health -= 30
+                if health < 0 {
+                    self.healthLbl?.text = "HEALTH: \(health)"
+                }else{
+                    self.healthLbl?.text = "HEALTH: \(0)"
+                    self.isGameOver()
+                }
+                bossIsPresent = false
+            }
+        }
+    }
+    
     /**
      ends the game
      */
@@ -556,6 +576,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         enumerateChildNodesWithName("enemy") { (enemy, _) in
             enemy.removeFromParent()
         }
+        
+        runAction(SKAction.repeatActionForever(
+            SKAction.sequence([
+                SKAction.runBlock(addEnemy),
+                SKAction.waitForDuration(4.0)
+                ])
+            ), withKey: "addEnemy")
+
         
         
     }
