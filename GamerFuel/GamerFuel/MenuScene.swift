@@ -20,10 +20,16 @@ class MenuScene: SKScene {
     
     var titleLabel: SKLabelNode?
     var newGameLabel:SKLabelNode?
-    
+    var bcImage:SKSpriteNode?
     override func didMoveToView(view: SKView) {
+        bcImage = SKSpriteNode(imageNamed: "background")
+        
+        
+        bcImage!.position = CGPointMake(self.size.width/2, self.size.height/2);
+        self.addChild(bcImage!)
         
         self.backgroundColor = UIColor.whiteColor()
+    
         
         self.titleLabel = SKLabelNode(fontNamed: "Brandley Hand")
         self.newGameLabel = SKLabelNode(fontNamed: "Arial")

@@ -56,7 +56,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
         
-        self.createBacground()
+        self.createBackground()
         
         self.healthLbl = SKLabelNode(fontNamed: "Arial")
         self.healthLbl?.text = "HEALTH: \(health)"
@@ -130,12 +130,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
         self.updatePoints()
-        self.crosshairScaleUpdate()
         
     }
     
-    func createBacground(){
-        background = SKSpriteNode(imageNamed: "back_placeholder")
+    func createBackground(){
+        background = SKSpriteNode(imageNamed: "background")
+        background!.size.width = 1280
+        background!.size.height = 720
+        
         background!.position = CGPointMake(self.size.width/2, self.size.height/2);
         self.addChild(background!)
         print("BACKGROUND")
@@ -586,12 +588,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
     }
     
-    func crosshairScaleUpdate(){
-//        if isPressed {
-//            self.crosshairScaleUpdate()
-//        }
 
-    }
     
     
 
