@@ -37,6 +37,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var pointsLbl:SKLabelNode?
     var gameOverLabel:SKLabelNode?
     var restartLbl:SKLabelNode?
+    var recordLbl:SKLabelNode?
     
     var health = 100
     
@@ -52,10 +53,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var numOfPoints:Int = 0
     var bossHealth = 0
     var avaliableImpulse = 2
+    var recordPoints = 0
     
     //Life cycle view
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
+        
+        
+  
         
         self.createBackground()
         
@@ -72,6 +77,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.pointsLbl?.position = CGPointMake(self.frame.width * 0.1, self.frame.height * 0.95)
         self.pointsLbl?.fontSize = 20
         self.addChild(pointsLbl!)
+        
+        self.recordLbl = SKLabelNode(fontNamed: "Arial")
+        self.recordLbl?.fontColor = UIColor.blackColor()
+        self.recordLbl?.text = "RECORD: \(recordPoints)"
+        self.recordLbl?.position = CGPointMake(self.frame.width * 0.1, self.frame.height * 0.90)
+        self.recordLbl?.fontSize = 20
+        self.addChild(recordLbl!)
+        
+        self.loadRecord()
+
         
         
         self.createHero()
@@ -126,7 +141,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if bossIsPresent {
             updateBoss()
         }
-        
         
         
      
@@ -480,6 +494,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             print("HIT AN ENEMY")
             if gameOver == false{
                 self.numOfPoints += 20
+                self.recordPoints += 20
                 self.enemyContact = true
                 self.explosion((secondBody.node as! SKSpriteNode).position)
                 self.removeEnemy(secondBody.node as! SKSpriteNode)
@@ -496,6 +511,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 bossEnemy!.removeFromParent()
                 bossIsPresent = false
                 self.numOfPoints += 30
+                self.recordPoints += 30
                 runAction(SKAction.repeatActionForever(
                     SKAction.sequence([
                         SKAction.runBlock(addEnemy),
@@ -551,6 +567,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     self.isGameOver()
                 }
                 bossIsPresent = false
+            }else{
+                self.explosion((self.bossEnemy?.position)!)
+                bossEnemy?.removeFromParent()
             }
 
             
@@ -593,6 +612,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.restartLbl?.fontSize = 20
         self.restartLbl?.position = CGPointMake(CGRectGetMidX(self.frame), (CGRectGetMidY(self.frame)) - 20)
         
+        if let rcrd = NSUserDefaults.standardUserDefaults().valueForKey("record") as? Int {
+            if recordPoints >  rcrd {
+                NSUserDefaults.standardUserDefaults().setInteger(recordPoints, forKey: "record")
+            }
+        }else {
+             NSUserDefaults.standardUserDefaults().setInteger(recordPoints, forKey: "record")
+        }
+        
         self.addChild(restartLbl!)
         
         
@@ -606,8 +633,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.gameOver = false
         self.health = 100
         self.numOfPoints = 0
+        self.recordPoints = 0
         self.healthLbl?.text = "HEALTH: \(health)"
         self.gameOverLabel?.removeFromParent()
+        self.restartLbl?.removeFromParent()
+        self.loadRecord()
         
         //get all the nodes with the same type
         enumerateChildNodesWithName("enemy") { (enemy, _) in
@@ -651,6 +681,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             crosshair?.yScale = yScale + 0.1
         }
         
+    }
+    
+    func loadRecord (){
+        
+        if let rcrd = NSUserDefaults.standardUserDefaults().integerForKey("record") as? Int {
+            self.recordLbl?.text = "RECORD: \(rcrd)"
+        }else {
+            self.recordLbl?.text = "RECORD: \(recordPoints)"
+        }
     }
     
 
