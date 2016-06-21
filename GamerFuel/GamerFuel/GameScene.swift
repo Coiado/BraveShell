@@ -495,7 +495,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 self.explosion((secondBody.node as! SKSpriteNode).position)
                 bossEnemy!.removeFromParent()
                 bossIsPresent = false
-                self.numOfPoints += 25
+                self.numOfPoints += 30
                 runAction(SKAction.repeatActionForever(
                     SKAction.sequence([
                         SKAction.runBlock(addEnemy),
