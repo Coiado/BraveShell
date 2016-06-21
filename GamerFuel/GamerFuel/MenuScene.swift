@@ -40,7 +40,7 @@ class MenuScene: SKScene {
         self.titleLabel?.fontColor = UIColor.blackColor()
         self.newGameLabel?.fontColor = UIColor.whiteColor()
         
-        self.titleLabel?.text = "Tatus Adventure"
+        self.titleLabel?.text = "The Brave Shell"
         self.newGameLabel?.text = "new game"
         
         self.titleLabel?.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!) ,y:CGRectGetMidY((self.scene?.frame)!) - (playButton.frame.height))
@@ -90,10 +90,11 @@ class MenuScene: SKScene {
     }
     
     override func pressesBegan(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
-        
+        super.pressesBegan(presses, withEvent: event)
     }
     
     override func pressesEnded(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
+        super.pressesEnded(presses, withEvent: event)
     }
     
     

@@ -98,7 +98,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         //set the physics world
         self.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
         self.physicsWorld.contactDelegate = self
-        let borderBody = SKPhysicsBody(edgeLoopFromRect: self.frame)
+        //let borderBody = SKPhysicsBody(edgeLoopFromRect: self.frame)
+        let borderBody = SKPhysicsBody(edgeLoopFromRect: CGRect(origin: CGPointMake(0, 60), size: CGSize(width: 1280, height: 660)))
         borderBody.friction = 1
         borderBody.restitution = 0
         self.physicsBody = borderBody
@@ -177,7 +178,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         hero = SKSpriteNode(imageNamed: "fulero_withoutborders.placeholder")
         hero!.xScale = 0.05
         hero!.yScale = 0.05
-        hero!.position = CGPoint(x: CGRectGetMidX(self.frame), y: (CGRectGetMinY(self.frame) + CGRectGetMaxY(hero!.frame)  ) )
+        hero!.position = CGPoint(x: CGRectGetMidX(self.frame), y: (CGRectGetMinY(self.frame) + CGRectGetMaxY(hero!.frame) + 60  ) )
         hero!.physicsBody = SKPhysicsBody(rectangleOfSize: hero!.size)
         hero!.physicsBody?.usesPreciseCollisionDetection = true
         hero!.physicsBody?.collisionBitMask = PhysicsCategories.Hero | PhysicsCategories.Crosshair | PhysicsCategories.Enemy | PhysicsCategories.floor
@@ -271,11 +272,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         enemy.physicsBody?.collisionBitMask = PhysicsCategories.Hero
         enemy.name = "enemy"
         
-        let actualX = random(min: enemy.size.width/2, max: size.width - enemy.size.height)
+        let actualX = random(min: enemy.size.width/2, max: size.width - enemy.size.height - 90)
         
         
         //enemy.position = CGPointMake(random(min: enemy.size.width * 0.5, max: self.size.width - (enemy.size.width * 0.5)), self.size.height + (enemy.size.height * 0.5))
-        enemy.position = CGPointMake(randomInRange(enemy.size.width * 0.5, high: self.size.width - (enemy.size.width * 0.5)), self.size.height + (enemy.size.height * 0.5))
+        enemy.position = CGPointMake(randomInRange(enemy.size.width * 0.5, high: self.size.width - (enemy.size.width * 0.5) - 60), self.size.height + (enemy.size.height * 0.5))
         addChild(enemy)
         
         let actualDuration = random(min: CGFloat(5), max: CGFloat(10.0))
@@ -334,12 +335,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     //MARK - Crosshair movient
     func crosshairMoviment(node:SKSpriteNode){
-        let firstMoviment = SKAction.rotateByAngle(1.39626, duration: 1)
+        let firstMoviment = SKAction.rotateByAngle(CGFloat(M_PI / 3), duration: 1)
         
-        let clockWiseMoviment = SKAction.rotateByAngle(-2.96706, duration: 1)
+        let clockWiseMoviment = SKAction.rotateByAngle(CGFloat((M_PI * 5) / 6 * -1), duration: 1)
         
-        let antiClockWiseMoviment = SKAction.rotateByAngle(2.96706, duration: 1)
-        
+        let antiClockWiseMoviment = SKAction.rotateByAngle(CGFloat((M_PI * 5) / 6), duration: 1)
+    
         let action = SKAction.repeatActionForever(SKAction.sequence([clockWiseMoviment,antiClockWiseMoviment]))
         
         node.runAction(firstMoviment, withKey:"firstMovment")
@@ -355,6 +356,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     //Low level press events
     override func pressesBegan(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
+        
+        super.pressesBegan(presses, withEvent: event)
 
         if gameOver == false {
             for item in presses {
@@ -493,8 +496,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
             print("HIT AN ENEMY")
             if gameOver == false{
-                self.numOfPoints += 20
-                self.recordPoints += 20
+                self.numOfPoints += 15
+                self.recordPoints += 15
                 self.enemyContact = true
                 self.explosion((secondBody.node as! SKSpriteNode).position)
                 self.removeEnemy(secondBody.node as! SKSpriteNode)
@@ -529,7 +532,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func updateEnemy(enemy:SKNode){
         
-        if enemy.position.y < 0 {
+        if enemy.frame.minY <= 90 {
             
             if gameOver == false {
                 enemy.removeFromParent()
@@ -554,7 +557,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func updateBoss(){
-        if bossEnemy?.frame.minY <=  0 {
+        if bossEnemy?.frame.minY <=  90 {
             if gameOver == false {
                 self.explosion((self.bossEnemy?.position)!)
                 
@@ -570,6 +573,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }else{
                 self.explosion((self.bossEnemy?.position)!)
                 bossEnemy?.removeFromParent()
+                bossIsPresent = false
             }
 
             
@@ -679,6 +683,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if xScale < 2.0 {
             crosshair?.xScale = xScale + 0.1
             crosshair?.yScale = yScale + 0.1
+            crosshair?.color = UIColor.redColor()
         }
         
     }
