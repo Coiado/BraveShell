@@ -51,7 +51,7 @@ class MenuScene: SKScene {
         self.addChild(titleLabel!)
         //self.addChild(newGameLabel!)
         playButton = SKSpriteNode(texture: playButtonTex)
-        playButton.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!),y: CGRectGetMidY((self.scene?.frame)!) - (titleLabel?.frame.height)!)
+        playButton.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!),y: CGRectGetMidY((self.scene?.frame)!) - (titleLabel?.frame.height)! - 10)
         self.playButton.xScale = 0.2
         self.playButton.yScale = 0.2
         self.playButton.color = UIColor.blueColor()

@@ -36,6 +36,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var healthLbl:SKLabelNode?
     var pointsLbl:SKLabelNode?
     var gameOverLabel:SKLabelNode?
+    var restartLbl:SKLabelNode?
     
     var health = 100
     
@@ -59,12 +60,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.createBackground()
         
         self.healthLbl = SKLabelNode(fontNamed: "Arial")
+        self.healthLbl?.fontColor = UIColor.blackColor()
         self.healthLbl?.text = "HEALTH: \(health)"
         self.healthLbl?.position = CGPointMake(self.frame.width * 0.9, self.frame.height * 0.95)
         self.healthLbl?.fontSize = 20
         self.addChild(healthLbl!)
         
         self.pointsLbl = SKLabelNode(fontNamed: "Arial")
+        self.pointsLbl?.fontColor = UIColor.blackColor()
         self.pointsLbl?.text = "POINTS: \(numOfPoints)"
         self.pointsLbl?.position = CGPointMake(self.frame.width * 0.1, self.frame.height * 0.95)
         self.pointsLbl?.fontSize = 20
@@ -289,7 +292,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         
         bossEnemy!.physicsBody = SKPhysicsBody(rectangleOfSize: bossEnemy!.size)
-        bossEnemy!.physicsBody?.dynamic = true
+        bossEnemy!.physicsBody?.dynamic = false
         bossEnemy?.physicsBody?.allowsRotation = false
         bossEnemy?.physicsBody?.affectedByGravity = false
         bossEnemy!.physicsBody?.categoryBitMask = PhysicsCategories.Boss
@@ -487,10 +490,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }else if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0 && ((secondBody.categoryBitMask & PhysicsCategories.Boss) != 0)){
             if (bossHealth > 0) {
                 bossHealth -= 1
+                self.hero!.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
             }else{
+                self.explosion((secondBody.node as! SKSpriteNode).position)
                 bossEnemy!.removeFromParent()
                 bossIsPresent = false
-                self.numOfPoints += 50
+                self.numOfPoints += 25
                 runAction(SKAction.repeatActionForever(
                     SKAction.sequence([
                         SKAction.runBlock(addEnemy),
@@ -533,11 +538,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func updateBoss(){
-        if bossEnemy?.position.y < 0 {
+        if bossEnemy?.frame.minY <=  0 {
             if gameOver == false {
+                self.explosion((self.bossEnemy?.position)!)
+                
                 bossEnemy?.removeFromParent()
                 health -= 30
-                if health < 0 {
+                if health > 0 {
                     self.healthLbl?.text = "HEALTH: \(health)"
                 }else{
                     self.healthLbl?.text = "HEALTH: \(0)"
@@ -545,7 +552,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 }
                 bossIsPresent = false
             }
+
+            
+            
         }
+        
+//        if bossEnemy?.position.y < 0 {
+//            if gameOver == false {
+//                self.explosion((self.bossEnemy?.position)!)
+//
+//                bossEnemy?.removeFromParent()
+//                health -= 30
+//                if health > 0 {
+//                    self.healthLbl?.text = "HEALTH: \(health)"
+//                }else{
+//                    self.healthLbl?.text = "HEALTH: \(0)"
+//                    self.isGameOver()
+//                }
+//                bossIsPresent = false
+//            }
+//        }
     }
     
     /**
@@ -553,6 +579,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      */
     func isGameOver(){
         self.gameOverLabel?.removeFromParent()
+        self.restartLbl?.removeFromParent()
 
         self.gameOver = true
         self.gameOverLabel = SKLabelNode(fontNamed: "Arial")
@@ -560,6 +587,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.gameOverLabel?.position = CGPointMake(CGRectGetMidX(self.frame), CGRectGetMidY(self.frame))
         self.gameOverLabel?.fontSize = 20
         self.addChild(gameOverLabel!)
+        
+        self.restartLbl = SKLabelNode(fontNamed:"Arial")
+        self.restartLbl?.text = "Tap on D-pad to restart"
+        self.restartLbl?.fontSize = 20
+        self.restartLbl?.position = CGPointMake(CGRectGetMidX(self.frame), (CGRectGetMidY(self.frame)) - 20)
+        
+        self.addChild(restartLbl!)
+        
+        
+        
 
     }
     /**
