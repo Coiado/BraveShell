@@ -13,7 +13,7 @@ import SpriteKit
 class MenuScene: SKScene {
     
     var playButton = SKSpriteNode()
-    let playButtonTex = SKTexture(imageNamed: "PlayButton")
+    let playButtonTex = SKTexture(imageNamed: "play_button")
     var gScene:GameScene?
 
     
@@ -21,12 +21,21 @@ class MenuScene: SKScene {
     var titleLabel: SKLabelNode?
     var newGameLabel:SKLabelNode?
     var bcImage:SKSpriteNode?
+    var logo:SKSpriteNode?
+    
     override func didMoveToView(view: SKView) {
+        
         bcImage = SKSpriteNode(imageNamed: "background")
         
         
         bcImage!.position = CGPointMake(self.size.width/2, self.size.height/2);
         self.addChild(bcImage!)
+        
+        self.logo = SKSpriteNode(imageNamed: "logo")
+        self.logo?.xScale = 2.5
+        self.logo?.yScale = 2.5
+        self.logo?.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame))
+        self.addChild(logo!)
         
         self.backgroundColor = UIColor.whiteColor()
     
@@ -43,17 +52,19 @@ class MenuScene: SKScene {
         self.titleLabel?.text = "The Brave Shell"
         self.newGameLabel?.text = "new game"
         
-        self.titleLabel?.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!) ,y:CGRectGetMidY((self.scene?.frame)!) - (playButton.frame.height))
+    
+        
+        //self.titleLabel?.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!) ,y:CGRectGetMidY((self.scene?.frame)!) - (playButton.frame.height))
         //self.titleLabel?.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!) ,y:CGRectGetMidY((self.scene?.frame)!))
         //self.newGameLabel?.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!),y: CGRectGetMidY((self.scene?.frame)!) - (titleLabel?.frame.height)!)
         
         
-        self.addChild(titleLabel!)
+        //self.addChild(titleLabel!)
         //self.addChild(newGameLabel!)
         playButton = SKSpriteNode(texture: playButtonTex)
-        playButton.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!),y: CGRectGetMidY((self.scene?.frame)!) - (titleLabel?.frame.height)! - 10)
-        self.playButton.xScale = 0.2
-        self.playButton.yScale = 0.2
+        playButton.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!),y: CGRectGetMidY((self.scene?.frame)!) - (logo?.frame.height)! - 10)
+        self.playButton.xScale = 1.5
+        self.playButton.yScale = 1.5
         self.playButton.color = UIColor.blueColor()
         self.addChild(playButton)
         
@@ -68,24 +79,35 @@ class MenuScene: SKScene {
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         
-        if let touch = touches.first  {
-            let pos = touch.locationInNode(self)
-            let node = self.nodeAtPoint(pos)
+//        if let touch = touches.first  {
+//            let pos = touch.locationInNode(self)
+//            let node = self.nodeAtPoint(pos)
+//            
+//            if node == playButton {
+//                if let view = self.view {
+//                    //let scene = GameScene(fileNamed: "GameScene")
+//                    
+//                    gScene!.scaleMode = .AspectFit
+//                    gScene?.size.width = 1280
+//                    gScene?.size.height = 720
+//
+//                    gScene!.scaleMode = SKSceneScaleMode.AspectFill
+//                    view.presentScene(gScene)
+//                }
+//            }
+//        }
+        if let view = self.view {
+            //let scene = GameScene(fileNamed: "GameScene")
             
-            if node == playButton {
-                if let view = self.view {
-                    //let scene = GameScene(fileNamed: "GameScene")
-                    
-                    gScene!.scaleMode = .AspectFit
-                    gScene?.size.width = 1280
-                    gScene?.size.height = 720
-
-                    gScene!.scaleMode = SKSceneScaleMode.AspectFill
-                    view.presentScene(gScene)
-                }
-            }
+            gScene!.scaleMode = .AspectFit
+            gScene?.size.width = 1280
+            gScene?.size.height = 720
+            gScene!.scaleMode = SKSceneScaleMode.AspectFill
+            view.presentScene(gScene)
         }
 
+
+        
         
     }
     
@@ -96,6 +118,8 @@ class MenuScene: SKScene {
     override func pressesEnded(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
         super.pressesEnded(presses, withEvent: event)
     }
+    
+    
     
     
 }

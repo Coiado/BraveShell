@@ -38,6 +38,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var gameOverLabel:SKLabelNode?
     var restartLbl:SKLabelNode?
     var recordLbl:SKLabelNode?
+    var boostLbl:SKLabelNode?
+    var gameOverScreen:SKSpriteNode?
     
     var health = 100
     
@@ -52,7 +54,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     var numOfPoints:Int = 0
     var bossHealth = 0
-    var avaliableImpulse = 2
+    var avaliableImpulse = 3
     var recordPoints = 0
     
     //Life cycle view
@@ -70,6 +72,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.healthLbl?.position = CGPointMake(self.frame.width * 0.9, self.frame.height * 0.95)
         self.healthLbl?.fontSize = 20
         self.addChild(healthLbl!)
+        
+        self.boostLbl = SKLabelNode(fontNamed: "Arial")
+        self.boostLbl?.fontColor = UIColor.blackColor()
+        self.boostLbl?.text = "BOOSTS: \(avaliableImpulse)"
+        self.boostLbl?.position = CGPointMake(self.frame.width * 0.9, self.frame.height * 0.90)
+        self.boostLbl?.fontSize = 20
+        self.addChild(boostLbl!)
         
         self.pointsLbl = SKLabelNode(fontNamed: "Arial")
         self.pointsLbl?.fontColor = UIColor.blackColor()
@@ -335,15 +344,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     //MARK - Crosshair movient
     func crosshairMoviment(node:SKSpriteNode){
-        let firstMoviment = SKAction.rotateByAngle(CGFloat(M_PI / 3), duration: 1)
+        let firstMoviment = SKAction.rotateByAngle(CGFloat(-75  * M_PI / 180), duration: 1)
         
-        let clockWiseMoviment = SKAction.rotateByAngle(CGFloat((M_PI * 5) / 6 * -1), duration: 1)
+        let secondMoviment = SKAction.rotateByAngle(CGFloat((5 * M_PI / 6 )), duration: 1)
         
-        let antiClockWiseMoviment = SKAction.rotateByAngle(CGFloat((M_PI * 5) / 6), duration: 1)
+        let clockWiseMoviment = SKAction.rotateByAngle(CGFloat(-5 * M_PI / 6 ), duration: 1)
+        
+        let antiClockWiseMoviment = SKAction.rotateByAngle(CGFloat(5 * M_PI / 6), duration: 1)
     
         let action = SKAction.repeatActionForever(SKAction.sequence([clockWiseMoviment,antiClockWiseMoviment]))
         
-        node.runAction(firstMoviment, withKey:"firstMovment")
+        node.runAction(firstMoviment, withKey:"firstMoviment")
+        node.runAction(secondMoviment, withKey: "secondMovimet")
         
         node.runAction(action,withKey:"crosshairAction")
         
@@ -375,6 +387,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 }
             }
 
+        }else{
+            self.timer?.invalidate()
         }
     }
     
@@ -415,6 +429,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                             print("Impulsing")
                             self.impulse(60)
                             avaliableImpulse -= 1
+                            self.boostLbl!.text = "BOOST: \(avaliableImpulse)"
                         }
                         
                         
@@ -431,6 +446,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 }
             }
             
+        }else{
+            timer?.invalidate()
         }
 
     }
@@ -451,6 +468,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         hero!.physicsBody?.velocity = CGVector(dx: velocity * -cos(direction) * 10, dy: velocity * -sin(direction) * 10)
         
+        let heroJ1 = SKTexture(imageNamed: "fulero_spining.1")
+        heroJ1.filteringMode = SKTextureFilteringMode.Nearest
+        let heroJ2 = SKTexture(imageNamed: "fulero_spining.2")
+        heroJ2.filteringMode = SKTextureFilteringMode.Nearest
+        let heroJ3 = SKTexture(imageNamed: "fulero_spining.3")
+        heroJ3.filteringMode = SKTextureFilteringMode.Nearest
+        let heroJ4 = SKTexture(imageNamed: "fulero_spining.4")
+        heroJ4.filteringMode = SKTextureFilteringMode.Nearest
+        let heroJ5 = SKTexture(imageNamed: "fulero_spining.5")
+        heroJ5.filteringMode = SKTextureFilteringMode.Nearest
+        let heroJ6 = SKTexture(imageNamed: "fulero_spining.6")
+        heroJ6.filteringMode = SKTextureFilteringMode.Nearest
+        
+        let spinning = SKAction.repeatActionForever(SKAction.animateWithTextures([heroJ1,heroJ2,heroJ3,heroJ4,heroJ5,heroJ6], timePerFrame: 0.1))
+        hero!.runAction(spinning, withKey: "spinning")
+        
         self.crosshair?.hidden = true
 
     }
@@ -462,7 +495,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         self.emiterFromJump(hero!.position)
         
-        hero!.physicsBody?.velocity = CGVector(dx:0, dy: velocity * -sin(direction) * 10)
+        hero!.physicsBody?.velocity = CGVector(dx:velocity * -cos(direction) * 10, dy: velocity * -sin(direction) * 10)
 
     }
     
@@ -484,6 +517,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0) && ((secondBody.categoryBitMask & PhysicsCategories.floor) != 0) {
             print("HIT THE FLOOR")
+            hero!.removeActionForKey("spinning")
+            hero!.texture = SKTexture(imageNamed: "fulero_withoutborders.placeholder")
             isJumping = false
             hero!.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
             self.hitTheFloor = true
@@ -601,20 +636,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      ends the game
      */
     func isGameOver(){
+        self.gameOverScreen?.removeFromParent()
+
         self.gameOverLabel?.removeFromParent()
         self.restartLbl?.removeFromParent()
+        
+        self.gameOverScreen = SKSpriteNode(imageNamed: "gameover_background")
+        self.gameOverScreen?.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame))
+        self.addChild(gameOverScreen!)
+        
+        
+        self.crosshair?.yScale = 0.9
+        self.crosshair?.xScale = 0.9
 
         self.gameOver = true
         self.gameOverLabel = SKLabelNode(fontNamed: "Arial")
-        self.gameOverLabel?.text = " GAME OVER"
-        self.gameOverLabel?.position = CGPointMake(CGRectGetMidX(self.frame), CGRectGetMidY(self.frame))
+        self.gameOverLabel?.text = "SCORE \(recordPoints)"
+        self.gameOverLabel?.position = CGPointMake(CGRectGetMidX(self.gameOverScreen!.frame), CGRectGetMidY(self.gameOverScreen!    .frame))
         self.gameOverLabel?.fontSize = 20
         self.addChild(gameOverLabel!)
         
-        self.restartLbl = SKLabelNode(fontNamed:"Arial")
-        self.restartLbl?.text = "Tap on D-pad to restart"
-        self.restartLbl?.fontSize = 20
-        self.restartLbl?.position = CGPointMake(CGRectGetMidX(self.frame), (CGRectGetMidY(self.frame)) - 20)
+//        self.restartLbl = SKLabelNode(fontNamed:"Arial")
+//        self.restartLbl?.text = "Tap on D-pad to restart"
+//        self.restartLbl?.fontSize = 20
+//        self.restartLbl?.position = CGPointMake(CGRectGetMidX(self.frame), (CGRectGetMidY(self.frame)) - 20)
         
         if let rcrd = NSUserDefaults.standardUserDefaults().valueForKey("record") as? Int {
             if recordPoints >  rcrd {
@@ -624,7 +669,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
              NSUserDefaults.standardUserDefaults().setInteger(recordPoints, forKey: "record")
         }
         
-        self.addChild(restartLbl!)
+        //self.addChild(restartLbl!)
         
         
         
@@ -634,10 +679,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      Restart all the stats of game
      */
     func restartTheGame(){
+        self.gameOverScreen?.removeFromParent()
+
         self.gameOver = false
         self.health = 100
         self.numOfPoints = 0
         self.recordPoints = 0
+        
+        self.crosshair?.yScale = 0.9
+        self.crosshair?.xScale = 0.9
+        self.crosshair?.zRotation = 0.0
+        self.crosshair?.zPosition = 0.0
+        self.crosshairMoviment(crosshair!)
+        
         self.healthLbl?.text = "HEALTH: \(health)"
         self.gameOverLabel?.removeFromParent()
         self.restartLbl?.removeFromParent()
