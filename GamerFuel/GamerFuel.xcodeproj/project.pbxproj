@@ -25,6 +25,7 @@
 		6BA234981D142E9B00393A22 /* JumpSmoke.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6BA234961D142E9B00393A22 /* JumpSmoke.sks */; };
 		6BA234991D142E9B00393A22 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BA234971D142E9B00393A22 /* spark.png */; };
 		6BB716F81D1976AE00C55D95 /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB716F71D1976AE00C55D95 /* MenuViewController.swift */; };
+		6BB716FA1D1AAF2E00C55D95 /* BossHit.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6BB716F91D1AAF2E00C55D95 /* BossHit.sks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +84,7 @@
 		6BA234961D142E9B00393A22 /* JumpSmoke.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = JumpSmoke.sks; sourceTree = "<group>"; };
 		6BA234971D142E9B00393A22 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
 		6BB716F71D1976AE00C55D95 /* MenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
+		6BB716F91D1AAF2E00C55D95 /* BossHit.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = BossHit.sks; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -177,6 +179,7 @@
 				6BA234911D142C0A00393A22 /* ExplosionParticle.sks */,
 				6BA234961D142E9B00393A22 /* JumpSmoke.sks */,
 				6BA234971D142E9B00393A22 /* spark.png */,
+				6BB716F91D1AAF2E00C55D95 /* BossHit.sks */,
 			);
 			name = Emiters;
 			sourceTree = "<group>";
@@ -293,6 +296,7 @@
 				6B47AD231D099A6200910647 /* Assets.xcassets in Resources */,
 				6BA234941D142C0A00393A22 /* spark.png in Resources */,
 				6B3EAF801D12C604005E4079 /* Menu.sks in Resources */,
+				6BB716FA1D1AAF2E00C55D95 /* BossHit.sks in Resources */,
 				6B47AD1E1D099A6200910647 /* Game.xcassets in Resources */,
 				6BA234931D142C0A00393A22 /* ExplosionParticle.sks in Resources */,
 				6BA234981D142E9B00393A22 /* JumpSmoke.sks in Resources */,

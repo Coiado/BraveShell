@@ -184,7 +184,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      */
     func createHero(){
         
-        hero = SKSpriteNode(imageNamed: "fulero_withoutborders.placeholder")
+        hero = SKSpriteNode(imageNamed: "fulero_idle.1")
         hero!.xScale = 0.05
         hero!.yScale = 0.05
         hero!.position = CGPoint(x: CGRectGetMidX(self.frame), y: (CGRectGetMinY(self.frame) + CGRectGetMaxY(hero!.frame) + 60  ) )
@@ -203,6 +203,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         hero?.physicsBody?.dynamic = true
         hero!.name = "hero"
         self.addChild(hero!)
+        self.fuleroIdle()
         print("HERO")
 
         
@@ -370,6 +371,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func pressesBegan(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
         
         super.pressesBegan(presses, withEvent: event)
+        
 
         if gameOver == false {
             for item in presses {
@@ -518,7 +520,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0) && ((secondBody.categoryBitMask & PhysicsCategories.floor) != 0) {
             print("HIT THE FLOOR")
             hero!.removeActionForKey("spinning")
-            hero!.texture = SKTexture(imageNamed: "fulero_withoutborders.placeholder")
+            hero!.texture = SKTexture(imageNamed: "fulero_idle.1")
+            self.fuleroIdle()
             isJumping = false
             hero!.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
             self.hitTheFloor = true
@@ -531,6 +534,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
             print("HIT AN ENEMY")
             if gameOver == false{
+                self.hero!.removeActionForKey("spinning")
+                self.hero!.texture = SKTexture(imageNamed: "fulero_falling")
                 self.numOfPoints += 15
                 self.recordPoints += 15
                 self.enemyContact = true
@@ -543,6 +548,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }else if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0 && ((secondBody.categoryBitMask & PhysicsCategories.Boss) != 0)){
             if (bossHealth > 0) {
                 bossHealth -= 1
+                self.emiterFromBossHit(bossEnemy!.position)
+                self.hitBossLbl((bossEnemy?.position)!)
                 self.hero!.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
             }else{
                 self.explosion((secondBody.node as! SKSpriteNode).position)
@@ -730,6 +737,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.runAction(SKAction.waitForDuration(2), completion: { emitterNode!.removeFromParent() })
     }
     
+    func emiterFromBossHit(pos:CGPoint){
+        let emitterNode = SKEmitterNode(fileNamed: "BossHit.sks")
+        emitterNode!.particlePosition = pos
+        self.addChild(emitterNode!)
+        // Don't forget to remove the emitter node after the jump
+        self.runAction(SKAction.waitForDuration(2), completion: { emitterNode!.removeFromParent() })
+    }
+    
     func changeCrosshairScale(){
         let xScale = crosshair!.xScale
         let yScale = crosshair!.yScale
@@ -739,7 +754,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             crosshair?.yScale = yScale + 0.1
             crosshair?.color = UIColor.redColor()
         }
+    }
+    
+    func hitBossLbl(pos:CGPoint){
+        let hitLabel = SKLabelNode(fontNamed: "Arial")
+        hitLabel.fontColor = UIColor.blackColor()
+        hitLabel.fontSize = 20
+        hitLabel.position = pos
+        hitLabel.text = "-1"
+        self.addChild(hitLabel)
         
+        self.runAction(SKAction.waitForDuration(2),completion:{hitLabel.removeFromParent()})
     }
     
     func loadRecord (){
@@ -749,6 +774,24 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }else {
             self.recordLbl?.text = "RECORD: \(recordPoints)"
         }
+    }
+    
+    func fuleroIdle (){
+        let heroI1 = SKTexture(imageNamed: "fulero_idle.1")
+        heroI1.filteringMode = SKTextureFilteringMode.Nearest
+        let heroI2 = SKTexture(imageNamed: "fulero_idle.2")
+        heroI2.filteringMode = SKTextureFilteringMode.Nearest
+        let heroI3 = SKTexture(imageNamed: "fulero_idle.3")
+        heroI3.filteringMode = SKTextureFilteringMode.Nearest
+        let heroI4 = SKTexture(imageNamed: "fulero_idle.4")
+        heroI4.filteringMode = SKTextureFilteringMode.Nearest
+        let heroI5 = SKTexture(imageNamed: "fulero_idle.5")
+        heroI5.filteringMode = SKTextureFilteringMode.Nearest
+        let heroI6 = SKTexture(imageNamed: "fulero_idle.6")
+        heroI6.filteringMode = SKTextureFilteringMode.Nearest
+        
+        let idle = SKAction.repeatActionForever(SKAction.animateWithTextures([heroI1,heroI2,heroI3,heroI4,heroI5,heroI6], timePerFrame: 0.2))
+        hero!.runAction(idle, withKey: "idle")
     }
     
 

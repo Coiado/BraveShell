@@ -112,11 +112,14 @@ class MenuScene: SKScene {
     }
     
     override func pressesBegan(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
-        super.pressesBegan(presses, withEvent: event)
+        //super.pressesBegan(presses, withEvent: event)
+        gScene!.pressesBegan(presses, withEvent: event)
+
     }
     
     override func pressesEnded(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
-        super.pressesEnded(presses, withEvent: event)
+        //super.pressesEnded(presses, withEvent: event)
+        gScene?.pressesEnded(presses, withEvent: event)
     }
     
     

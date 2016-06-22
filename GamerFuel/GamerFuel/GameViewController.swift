@@ -39,7 +39,7 @@ class GameViewController: UIViewController {
         
         /* Set the scale mode to scale to fit the window */
         gameScene!.scaleMode = .AspectFill
-        gameScene?.size.width = 1080
+        gameScene?.size.width = 1280
         gameScene?.size.height = 720
         
         menu!.createScene(gameScene!)
