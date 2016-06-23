@@ -22,6 +22,7 @@ class MenuScene: SKScene {
     var newGameLabel:SKLabelNode?
     var bcImage:SKSpriteNode?
     var logo:SKSpriteNode?
+    var backgroundMusic: SKAudioNode?
     
     override func didMoveToView(view: SKView) {
         
@@ -98,7 +99,6 @@ class MenuScene: SKScene {
 //        }
         if let view = self.view {
             //let scene = GameScene(fileNamed: "GameScene")
-            
             gScene!.scaleMode = .AspectFit
             gScene?.size.width = 1280
             gScene?.size.height = 720

@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3FE9AD621D1BFF69004D0D84 /* Explosion5.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3FE9AD5D1D1BFF69004D0D84 /* Explosion5.wav */; };
+		3FE9AD631D1BFF69004D0D84 /* MightEagleSound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 3FE9AD5E1D1BFF69004D0D84 /* MightEagleSound.mp3 */; };
+		3FE9AD641D1BFF69004D0D84 /* MinionEagleSound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 3FE9AD5F1D1BFF69004D0D84 /* MinionEagleSound.mp3 */; };
+		3FE9AD651D1BFF69004D0D84 /* somjogo.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 3FE9AD601D1BFF69004D0D84 /* somjogo.mp3 */; };
+		3FE9AD661D1BFF69004D0D84 /* somstart.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 3FE9AD611D1BFF69004D0D84 /* somstart.mp3 */; };
 		6B3EAF801D12C604005E4079 /* Menu.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6B3EAF7F1D12C604005E4079 /* Menu.sks */; };
 		6B3EAF821D12C629005E4079 /* MenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B3EAF811D12C629005E4079 /* MenuScene.swift */; };
 		6B47AD161D099A6200910647 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B47AD151D099A6200910647 /* AppDelegate.swift */; };
@@ -18,8 +23,6 @@
 		6B47AD231D099A6200910647 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6B47AD221D099A6200910647 /* Assets.xcassets */; };
 		6B47AD2E1D099A6200910647 /* GamerFuelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B47AD2D1D099A6200910647 /* GamerFuelTests.swift */; };
 		6B47AD391D099A6200910647 /* GamerFuelUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B47AD381D099A6200910647 /* GamerFuelUITests.swift */; };
-		6B47AD491D099F3C00910647 /* VirtualGameController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B47AD481D099F3C00910647 /* VirtualGameController.framework */; };
-		6B47AD4A1D099F3C00910647 /* VirtualGameController.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 6B47AD481D099F3C00910647 /* VirtualGameController.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6BA234931D142C0A00393A22 /* ExplosionParticle.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6BA234911D142C0A00393A22 /* ExplosionParticle.sks */; };
 		6BA234941D142C0A00393A22 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BA234921D142C0A00393A22 /* spark.png */; };
 		6BA234981D142E9B00393A22 /* JumpSmoke.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6BA234961D142E9B00393A22 /* JumpSmoke.sks */; };
@@ -52,7 +55,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				6B47AD4A1D099F3C00910647 /* VirtualGameController.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -60,6 +62,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3FE9AD5D1D1BFF69004D0D84 /* Explosion5.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Explosion5.wav; sourceTree = "<group>"; };
+		3FE9AD5E1D1BFF69004D0D84 /* MightEagleSound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = MightEagleSound.mp3; sourceTree = "<group>"; };
+		3FE9AD5F1D1BFF69004D0D84 /* MinionEagleSound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = MinionEagleSound.mp3; sourceTree = "<group>"; };
+		3FE9AD601D1BFF69004D0D84 /* somjogo.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = somjogo.mp3; sourceTree = "<group>"; };
+		3FE9AD611D1BFF69004D0D84 /* somstart.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = somstart.mp3; sourceTree = "<group>"; };
 		6B3EAF7F1D12C604005E4079 /* Menu.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Menu.sks; sourceTree = "<group>"; };
 		6B3EAF811D12C629005E4079 /* MenuScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuScene.swift; sourceTree = "<group>"; };
 		6B47AD121D099A6200910647 /* GamerFuel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GamerFuel.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -77,8 +84,6 @@
 		6B47AD341D099A6200910647 /* GamerFuelUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GamerFuelUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B47AD381D099A6200910647 /* GamerFuelUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GamerFuelUITests.swift; sourceTree = "<group>"; };
 		6B47AD3A1D099A6200910647 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		6B47AD461D099F2D00910647 /* VirtualGameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VirtualGameController.framework; path = Carthage/Build/tvOS/VirtualGameController.framework; sourceTree = "<group>"; };
-		6B47AD481D099F3C00910647 /* VirtualGameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VirtualGameController.framework; path = Carthage/Build/tvOS/VirtualGameController.framework; sourceTree = "<group>"; };
 		6BA234911D142C0A00393A22 /* ExplosionParticle.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; name = ExplosionParticle.sks; path = ../ExplosionParticle.sks; sourceTree = "<group>"; };
 		6BA234921D142C0A00393A22 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spark.png; path = ../spark.png; sourceTree = "<group>"; };
 		6BA234961D142E9B00393A22 /* JumpSmoke.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = JumpSmoke.sks; sourceTree = "<group>"; };
@@ -92,7 +97,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6B47AD491D099F3C00910647 /* VirtualGameController.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,8 +120,6 @@
 		6B47AD091D099A6200910647 = {
 			isa = PBXGroup;
 			children = (
-				6B47AD481D099F3C00910647 /* VirtualGameController.framework */,
-				6B47AD461D099F2D00910647 /* VirtualGameController.framework */,
 				6B47AD141D099A6200910647 /* GamerFuel */,
 				6B47AD2C1D099A6200910647 /* GamerFuelTests */,
 				6B47AD371D099A6200910647 /* GamerFuelUITests */,
@@ -138,6 +140,11 @@
 		6B47AD141D099A6200910647 /* GamerFuel */ = {
 			isa = PBXGroup;
 			children = (
+				3FE9AD5D1D1BFF69004D0D84 /* Explosion5.wav */,
+				3FE9AD5E1D1BFF69004D0D84 /* MightEagleSound.mp3 */,
+				3FE9AD5F1D1BFF69004D0D84 /* MinionEagleSound.mp3 */,
+				3FE9AD601D1BFF69004D0D84 /* somjogo.mp3 */,
+				3FE9AD611D1BFF69004D0D84 /* somstart.mp3 */,
 				6BA234951D142E7600393A22 /* Emiters */,
 				6B47AD151D099A6200910647 /* AppDelegate.swift */,
 				6B47AD171D099A6200910647 /* GameScene.sks */,
@@ -292,14 +299,19 @@
 			files = (
 				6B47AD211D099A6200910647 /* Main.storyboard in Resources */,
 				6BA234991D142E9B00393A22 /* spark.png in Resources */,
+				3FE9AD621D1BFF69004D0D84 /* Explosion5.wav in Resources */,
 				6B47AD181D099A6200910647 /* GameScene.sks in Resources */,
+				3FE9AD661D1BFF69004D0D84 /* somstart.mp3 in Resources */,
 				6B47AD231D099A6200910647 /* Assets.xcassets in Resources */,
 				6BA234941D142C0A00393A22 /* spark.png in Resources */,
 				6B3EAF801D12C604005E4079 /* Menu.sks in Resources */,
+				3FE9AD641D1BFF69004D0D84 /* MinionEagleSound.mp3 in Resources */,
 				6BB716FA1D1AAF2E00C55D95 /* BossHit.sks in Resources */,
 				6B47AD1E1D099A6200910647 /* Game.xcassets in Resources */,
+				3FE9AD631D1BFF69004D0D84 /* MightEagleSound.mp3 in Resources */,
 				6BA234931D142C0A00393A22 /* ExplosionParticle.sks in Resources */,
 				6BA234981D142E9B00393A22 /* JumpSmoke.sks in Resources */,
+				3FE9AD651D1BFF69004D0D84 /* somjogo.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
