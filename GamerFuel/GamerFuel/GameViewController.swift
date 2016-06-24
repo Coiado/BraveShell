@@ -14,21 +14,11 @@ class GameViewController: UIViewController {
     
     let gameScene = GameScene(fileNamed: "GameScene")
     var menu:MenuScene?
-    var chooseTeamBackgroundURL = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("somjogo", ofType: "mp3")!)
-    var chooseTeamBackgroundSong = AVAudioPlayer()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
 
-    override func viewDidAppear(animated: Bool) {
-        chooseTeamBackgroundSong = try! AVAudioPlayer(contentsOfURL: chooseTeamBackgroundURL)
-        chooseTeamBackgroundSong.play()
-    }
-    
-    override func viewWillDisappear(animated: Bool) {
-        self.chooseTeamBackgroundSong.pause()
-    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

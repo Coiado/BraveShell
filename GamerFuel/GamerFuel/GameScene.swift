@@ -32,6 +32,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var floor:SKSpriteNode?
     var startTime:NSDate?
     var endDate:NSDate?
+    var backgroundMusic: SKAudioNode!
+    var minionEagleSound: SKAudioNode!
     
     var healthLbl:SKLabelNode?
     var pointsLbl:SKLabelNode?
@@ -96,7 +98,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         self.loadRecord()
 
-        
+        let backgroundURL = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("somjogo", ofType: "mp3")!)
+        backgroundMusic = SKAudioNode(URL: backgroundURL)
+        addChild(backgroundMusic)
         
         self.createHero()
         self.createCrosshair()
@@ -269,7 +273,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         let enemy = SKSpriteNode(texture: enemy1)
         
-         let direction : CGVector  = radiansToVector(randomInRange(kCCHaloLowAngle, high: kCCHaloHighAngle));
+        let direction : CGVector  = radiansToVector(randomInRange(kCCHaloLowAngle, high: kCCHaloHighAngle));
         
         enemy.physicsBody?.velocity = CGVectorMake(direction.dx * kCCHaloSpeed, direction.dy * kCCHaloSpeed)
         
@@ -540,6 +544,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 self.recordPoints += 15
                 self.enemyContact = true
                 self.explosion((secondBody.node as! SKSpriteNode).position)
+                runAction(SKAction.playSoundFileNamed("MinionEagleSound.wav", waitForCompletion: false))
                 self.removeEnemy(secondBody.node as! SKSpriteNode)
 
             }else{
@@ -557,6 +562,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 bossIsPresent = false
                 self.numOfPoints += 30
                 self.recordPoints += 30
+                runAction(SKAction.playSoundFileNamed("MightEagleSound.wav", waitForCompletion: false))
                 runAction(SKAction.repeatActionForever(
                     SKAction.sequence([
                         SKAction.runBlock(addEnemy),

@@ -15,14 +15,13 @@ class MenuScene: SKScene {
     var playButton = SKSpriteNode()
     let playButtonTex = SKTexture(imageNamed: "play_button")
     var gScene:GameScene?
+    
 
-    
-    
     var titleLabel: SKLabelNode?
     var newGameLabel:SKLabelNode?
     var bcImage:SKSpriteNode?
     var logo:SKSpriteNode?
-    var backgroundMusic: SKAudioNode?
+    var backgroundMusic: SKAudioNode!
     
     override func didMoveToView(view: SKView) {
         
@@ -53,7 +52,9 @@ class MenuScene: SKScene {
         self.titleLabel?.text = "The Brave Shell"
         self.newGameLabel?.text = "new game"
         
-    
+        let backgroundURL = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("somstart", ofType: "mp3")!)
+        backgroundMusic = SKAudioNode(URL: backgroundURL)
+        addChild(backgroundMusic)
         
         //self.titleLabel?.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!) ,y:CGRectGetMidY((self.scene?.frame)!) - (playButton.frame.height))
         //self.titleLabel?.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!) ,y:CGRectGetMidY((self.scene?.frame)!))
@@ -98,12 +99,14 @@ class MenuScene: SKScene {
 //            }
 //        }
         if let view = self.view {
-            //let scene = GameScene(fileNamed: "GameScene")
+            let scene = GameScene(fileNamed: "GameScene")
+            backgroundMusic.runAction(SKAction.stop())
             gScene!.scaleMode = .AspectFit
             gScene?.size.width = 1280
             gScene?.size.height = 720
             gScene!.scaleMode = SKSceneScaleMode.AspectFill
             view.presentScene(gScene)
+            
         }
 
 
