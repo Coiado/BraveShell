@@ -98,17 +98,7 @@ class MenuScene: SKScene {
 //                }
 //            }
 //        }
-<<<<<<< HEAD
-        if let view = self.view {
-            let scene = GameScene(fileNamed: "GameScene")
-            backgroundMusic.runAction(SKAction.stop())
-            gScene!.scaleMode = .AspectFit
-            gScene?.size.width = 1280
-            gScene?.size.height = 720
-            gScene!.scaleMode = SKSceneScaleMode.AspectFill
-            view.presentScene(gScene)
-            
-=======
+
         
         
 //        
@@ -117,7 +107,7 @@ class MenuScene: SKScene {
         
         playButton.runAction(SKAction.sequence([SKAction.scaleXTo(2.0, y: 2.0, duration: 0.2), SKAction.scaleXTo(1.5, y: 1.5, duration: 0.2)])) {
             self.createView()
->>>>>>> 7b075e522c479f9b823c9db23f59010c83b78f92
+
         }
        
         
