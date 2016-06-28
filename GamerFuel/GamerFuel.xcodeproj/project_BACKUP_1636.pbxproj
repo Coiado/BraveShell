@@ -148,11 +148,15 @@
 		6B47AD141D099A6200910647 /* GamerFuel */ = {
 			isa = PBXGroup;
 			children = (
+<<<<<<< HEAD
 				3FE9AD5D1D1BFF69004D0D84 /* Explosion5.wav */,
 				3FE9AD601D1BFF69004D0D84 /* somjogo.mp3 */,
 				3FE9AD691D1CBAD5004D0D84 /* MightEagleSound.wav */,
 				3FE9AD671D1CB82B004D0D84 /* MinionEagleSound.wav */,
 				3FE9AD611D1BFF69004D0D84 /* somstart.mp3 */,
+=======
+				6BCA4C671D1BFBA5002208CF /* Resources */,
+>>>>>>> 7b075e522c479f9b823c9db23f59010c83b78f92
 				6BA234951D142E7600393A22 /* Emiters */,
 				6B47AD151D099A6200910647 /* AppDelegate.swift */,
 				6B47AD171D099A6200910647 /* GameScene.sks */,

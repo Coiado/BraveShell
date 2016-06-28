@@ -69,7 +69,7 @@ class MenuScene: SKScene {
         self.playButton.yScale = 1.5
         self.playButton.color = UIColor.blueColor()
         self.addChild(playButton)
-        
+
         
     }
     
@@ -98,6 +98,7 @@ class MenuScene: SKScene {
 //                }
 //            }
 //        }
+<<<<<<< HEAD
         if let view = self.view {
             let scene = GameScene(fileNamed: "GameScene")
             backgroundMusic.runAction(SKAction.stop())
@@ -107,10 +108,23 @@ class MenuScene: SKScene {
             gScene!.scaleMode = SKSceneScaleMode.AspectFill
             view.presentScene(gScene)
             
-        }
-
-
+=======
         
+        
+//        
+//        let timer = NSTimer(timeInterval: 1, target: self, selector: #selector(resizeButton), userInfo: nil, repeats: false)
+//        timer.fire()
+        
+        playButton.runAction(SKAction.sequence([SKAction.scaleXTo(2.0, y: 2.0, duration: 0.2), SKAction.scaleXTo(1.5, y: 1.5, duration: 0.2)])) {
+            self.createView()
+>>>>>>> 7b075e522c479f9b823c9db23f59010c83b78f92
+        }
+       
+        
+    
+        
+        self.resizeButton()
+       
         
     }
     
@@ -123,6 +137,33 @@ class MenuScene: SKScene {
     override func pressesEnded(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
         //super.pressesEnded(presses, withEvent: event)
         gScene?.pressesEnded(presses, withEvent: event)
+    }
+    
+    
+    func createView(){
+        if let view = self.view {
+            //let scene = GameScene(fileNamed: "GameScene")
+            
+            gScene!.scaleMode = .AspectFit
+            gScene?.size.width = 1280
+            gScene?.size.height = 720
+            gScene!.scaleMode = SKSceneScaleMode.AspectFill
+            view.presentScene(gScene)
+        }
+
+    }
+    
+    
+    func resizeButton(){
+        self.playButton.xScale = 2.0
+        self.playButton.yScale = 2.0
+//        self.playButton.xScale = 1.5
+//        self.playButton.yScale = 1.5
+    }
+    
+    func resizeLessButton(){
+        self.playButton.xScale = 1.5
+        self.playButton.yScale = 1.5
     }
     
     

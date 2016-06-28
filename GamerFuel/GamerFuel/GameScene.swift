@@ -68,29 +68,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         self.createBackground()
         
-        self.healthLbl = SKLabelNode(fontNamed: "Arial")
-        self.healthLbl?.fontColor = UIColor.blackColor()
+        self.healthLbl = SKLabelNode(fontNamed: "Futura")
+        //self.healthLbl?.fontColor = UIColor(red: 103, green: 55, blue: 78, alpha: 1.0)
+        self.healthLbl?.fontColor = UIColor.purpleColor()
         self.healthLbl?.text = "HEALTH: \(health)"
         self.healthLbl?.position = CGPointMake(self.frame.width * 0.9, self.frame.height * 0.95)
         self.healthLbl?.fontSize = 20
         self.addChild(healthLbl!)
         
-        self.boostLbl = SKLabelNode(fontNamed: "Arial")
-        self.boostLbl?.fontColor = UIColor.blackColor()
+        self.boostLbl = SKLabelNode(fontNamed: "Futura")
+        self.boostLbl?.fontColor = UIColor.purpleColor()
         self.boostLbl?.text = "BOOSTS: \(avaliableImpulse)"
         self.boostLbl?.position = CGPointMake(self.frame.width * 0.9, self.frame.height * 0.90)
         self.boostLbl?.fontSize = 20
         self.addChild(boostLbl!)
         
-        self.pointsLbl = SKLabelNode(fontNamed: "Arial")
-        self.pointsLbl?.fontColor = UIColor.blackColor()
+        self.pointsLbl = SKLabelNode(fontNamed: "Futura")
+        self.pointsLbl?.fontColor = UIColor.purpleColor()
         self.pointsLbl?.text = "POINTS: \(numOfPoints)"
         self.pointsLbl?.position = CGPointMake(self.frame.width * 0.1, self.frame.height * 0.95)
         self.pointsLbl?.fontSize = 20
         self.addChild(pointsLbl!)
         
-        self.recordLbl = SKLabelNode(fontNamed: "Arial")
-        self.recordLbl?.fontColor = UIColor.blackColor()
+        self.recordLbl = SKLabelNode(fontNamed: "Futura")
+        self.recordLbl?.fontColor = UIColor.purpleColor()
         self.recordLbl?.text = "RECORD: \(recordPoints)"
         self.recordLbl?.position = CGPointMake(self.frame.width * 0.1, self.frame.height * 0.90)
         self.recordLbl?.fontSize = 20
@@ -105,7 +106,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.createHero()
         self.createCrosshair()
         
-        print(self.view?.frame.width)
+        //print(self.view?.frame.width)
         
         
         //set the physics world
@@ -148,13 +149,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
         
-        if numOfPoints % 20 == 0 && numOfPoints > 0 && bossIsPresent != true {
-            self.addBoss()
-        }
-        
-        if bossIsPresent {
-            updateBoss()
-        }
+//         if numOfPoints % 20 == 0 && numOfPoints > 0 && bossIsPresent != true {
+//            self.addBoss()
+//        }
+//        
+//        if bossIsPresent {
+//            updateBoss()
+//        }
         
         
      
@@ -175,7 +176,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         background!.position = CGPointMake(self.size.width/2, self.size.height/2);
         self.addChild(background!)
-        print("BACKGROUND")
+        //print("BACKGROUND")
         
     }
     
@@ -208,7 +209,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         hero!.name = "hero"
         self.addChild(hero!)
         self.fuleroIdle()
-        print("HERO")
+        //print("HERO")
 
         
     }
@@ -223,7 +224,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         crosshair!.position = CGPoint(x: hero!.frame.width * 0.5, y: hero!.frame.height * 15)
         crosshair!.name = "small"
         hero!.addChild(crosshair!)
-        print("CROSSHAIR")
+        //print("CROSSHAIR")
 
 
     }
@@ -381,7 +382,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             for item in presses {
                 
                 if item.type == .PlayPause{
-                    print("pressed")
+                    //print("pressed")
                     self.startTime = NSDate()
                     crosshair?.removeAllActions()
                     
@@ -432,7 +433,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
                     }else if isJumping == true {
                         if avaliableImpulse > 0 {
-                            print("Impulsing")
+                            //print("Impulsing")
                             self.impulse(60)
                             avaliableImpulse -= 1
                             self.boostLbl!.text = "BOOST: \(avaliableImpulse)"
@@ -442,7 +443,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         
                     }
                     
-                    print("released\(timePressed)")
+                    //print("released\(timePressed)")
                     self.crosshair?.zRotation = 0.0
                     self.crosshair?.zPosition = 0.0
                     
@@ -467,7 +468,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
      */
     func jump(velocity:CGFloat){
         isJumping = true
-        print(crosshair!.zRotation)
+        //print(crosshair!.zRotation)
         let direction = crosshair!.zRotation - CGFloat(M_PI)/2
         
         self.emiterFromJump(hero!.position)
@@ -522,7 +523,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         
         if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0) && ((secondBody.categoryBitMask & PhysicsCategories.floor) != 0) {
-            print("HIT THE FLOOR")
+            //print("HIT THE FLOOR")
             hero!.removeActionForKey("spinning")
             hero!.texture = SKTexture(imageNamed: "fulero_idle.1")
             self.fuleroIdle()
@@ -536,7 +537,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
         }else if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0 && ((secondBody.categoryBitMask & PhysicsCategories.Enemy) != 0)) {
             
-            print("HIT AN ENEMY")
+            //print("HIT AN ENEMY")
             if gameOver == false{
                 self.hero!.removeActionForKey("spinning")
                 self.hero!.texture = SKTexture(imageNamed: "fulero_falling")
