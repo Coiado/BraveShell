@@ -12,6 +12,7 @@ import GameController
 /**
  *  Describes the colision mask between nodes
  */
+
 struct PhysicsCategories {
     static let Hero      :UInt32 = 0x1 << 0
     static let Crosshair :UInt32 = 0x1 << 1
@@ -19,6 +20,7 @@ struct PhysicsCategories {
     static let Enemy     :UInt32 = 0x1 << 3
     static let floor     :UInt32 = 0x1 << 4
 }
+
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     
@@ -51,58 +53,50 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var bossIsPresent = false
     
     var timer:NSTimer?
+    var addEnemyTimer:NSTimer?
     
     var numOfPoints:Int = 0
     var bossHealth = 0
     var avaliableImpulse = 3
     var recordPoints = 0
     
+    let heroClass = Hero()
+    let backgroundClass = Background()
+    let crosshairClass = Crosshair()
+    let enemy = Enemy()
+    let act = Actions()
+    let labels = Labels()
+    let gameAct  = GameActions()
+    let heroAct = HeroActions()
+    
+    
     //Life cycle view
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
         
+        hero = SKSpriteNode(imageNamed: "fulero_idle.1")
+        background = SKSpriteNode(imageNamed: "background")
+        crosshair = SKSpriteNode(imageNamed: "crosshair_arrow")
         
-  
+        backgroundClass.createBackground(background!, scene: self)
+        heroClass.createHero(hero!, scene: self)
+        crosshairClass.createCrosshair(crosshair!, hero: hero!)
         
-        self.createBackground()
         
-        self.healthLbl = SKLabelNode(fontNamed: "Futura")
-        //self.healthLbl?.fontColor = UIColor(red: 103, green: 55, blue: 78, alpha: 1.0)
-        self.healthLbl?.fontColor = UIColor.purpleColor()
-        self.healthLbl?.text = "HEALTH: \(health)"
-        self.healthLbl?.position = CGPointMake(self.frame.width * 0.9, self.frame.height * 0.95)
-        self.healthLbl?.fontSize = 20
-        self.addChild(healthLbl!)
+        healthLbl = SKLabelNode(fontNamed: "Futura")
+        labels.createHealthLabel(healthLbl!, scene: self, health: health)
+        
         
         self.boostLbl = SKLabelNode(fontNamed: "Futura")
-        self.boostLbl?.fontColor = UIColor.purpleColor()
-        self.boostLbl?.text = "BOOSTS: \(avaliableImpulse)"
-        self.boostLbl?.position = CGPointMake(self.frame.width * 0.9, self.frame.height * 0.90)
-        self.boostLbl?.fontSize = 20
-        self.addChild(boostLbl!)
+        labels.createBoostLabel(self.boostLbl!,scene: self, avaliableImpulse: avaliableImpulse)
         
         self.pointsLbl = SKLabelNode(fontNamed: "Futura")
-        self.pointsLbl?.fontColor = UIColor.purpleColor()
-        self.pointsLbl?.text = "POINTS: \(numOfPoints)"
-        self.pointsLbl?.position = CGPointMake(self.frame.width * 0.1, self.frame.height * 0.95)
-        self.pointsLbl?.fontSize = 20
-        self.addChild(pointsLbl!)
+        labels.createPointsLabel(self.pointsLbl!, scene: self, numOfPoints:numOfPoints)
         
         self.recordLbl = SKLabelNode(fontNamed: "Futura")
-        self.recordLbl?.fontColor = UIColor.purpleColor()
-        self.recordLbl?.text = "RECORD: \(recordPoints)"
-        self.recordLbl?.position = CGPointMake(self.frame.width * 0.1, self.frame.height * 0.90)
-        self.recordLbl?.fontSize = 20
-        self.addChild(recordLbl!)
+        labels.createRecordLabel(self.recordLbl!, scene:self, recordPoints:recordPoints)
         
-        self.loadRecord()
-
-        
-        
-        self.createHero()
-        self.createCrosshair()
-        
-        //print(self.view?.frame.width)
+        gameAct.loadRecord(self.recordLbl!, recordPoints: self.recordPoints)
         
         
         //set the physics world
@@ -117,15 +111,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
         
         //crosshair config
-        self.crosshairMoviment(self.crosshair!)
+        gameAct.crosshairMoviment(self.crosshair!)
+        
         
         
         runAction(SKAction.repeatActionForever(
             SKAction.sequence([
-                SKAction.runBlock(addEnemy),
+                SKAction.runBlock({self.enemy.addEnemy(self)}),
                 SKAction.waitForDuration(4.0)
                 ])
             ), withKey: "addEnemy")
+        
+        addEnemyTimer?.fire()
     }
     
     
@@ -161,219 +158,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 self.updateEnemy(enemy)
             }
         }
-        self.updatePoints()
+        gameAct.updatePoints(enemyContact, numOfPoints: numOfPoints, pointsLbl:pointsLbl!)
         
     }
-    
-    func createBackground(){
-        background = SKSpriteNode(imageNamed: "background")
-        background!.size.width = 1280
-        background!.size.height = 720
-        
-        background!.position = CGPointMake(self.size.width/2, self.size.height/2);
-        self.addChild(background!)
-        //print("BACKGROUND")
-        
-    }
-    
-    
-    
-    //MARK: - Node creation Methods
-    
-    /**
-     create a caracter to represent the hero
-     */
-    func createHero(){
-        
-        hero = SKSpriteNode(imageNamed: "fulero_idle.1")
-        hero!.xScale = 0.05
-        hero!.yScale = 0.05
-        hero!.position = CGPoint(x: CGRectGetMidX(self.frame), y: (CGRectGetMinY(self.frame) + CGRectGetMaxY(hero!.frame) + 60  ) )
-        hero!.physicsBody = SKPhysicsBody(rectangleOfSize: hero!.size)
-        hero!.physicsBody?.usesPreciseCollisionDetection = true
-        hero!.physicsBody?.collisionBitMask = PhysicsCategories.Hero | PhysicsCategories.Crosshair | PhysicsCategories.Enemy | PhysicsCategories.floor
-        hero!.physicsBody?.categoryBitMask = PhysicsCategories.Hero
-        hero!.physicsBody?.contactTestBitMask = PhysicsCategories.Hero | PhysicsCategories.Crosshair | PhysicsCategories.Enemy | PhysicsCategories.floor
-        hero!.physicsBody?.allowsRotation = false
-        hero!.physicsBody?.friction = 0
-        hero!.physicsBody?.restitution = 0
-        hero!.physicsBody?.linearDamping = 0
-        hero?.physicsBody?.angularDamping = 0
-        hero!.physicsBody?.mass = 28
-        hero!.physicsBody?.affectedByGravity  = true
-        hero?.physicsBody?.dynamic = true
-        hero!.name = "hero"
-        self.addChild(hero!)
-        self.fuleroIdle()
-        //print("HERO")
 
-        
-    }
-    /**
-     create a crosshair to guide the player jump  during the gameplay
-     */
-    func createCrosshair(){
-        
-        self.crosshair = SKSpriteNode(imageNamed: "crosshair_arrow")
-        crosshair!.xScale = 0.9
-        crosshair!.yScale = 0.9
-        crosshair!.position = CGPoint(x: hero!.frame.width * 0.5, y: hero!.frame.height * 15)
-        crosshair!.name = "small"
-        hero!.addChild(crosshair!)
-        //print("CROSSHAIR")
-
-
-    }
-    
-    //Essential funtions to generate the position of born of the enemies
-    func random() -> CGFloat {
-        return CGFloat(Float(arc4random()) / 0xFFFFFFFF)
-    }
-    
-    func random(min min: CGFloat, max: CGFloat) -> CGFloat {
-        return random() * (max - min) + min
-    }
-    
-    func randomInRange(low: CGFloat, high: CGFloat) -> CGFloat {
-        let value = CGFloat(arc4random_uniform(UINT32_MAX)) / CGFloat(UINT32_MAX)
-        return value * (high - low) + low
-    }
-
-    func radiansToVector(radians: CGFloat) -> CGVector {
-        return CGVector(dx: cos(radians), dy: sin(radians))
-    }
-
-
-    /**
-     add an enemy on the screen
-     */
-    func addEnemy(){
-        //Add textures
-        let enemy1 = SKTexture(imageNamed: "minion_eagle.1")
-        enemy1.filteringMode = SKTextureFilteringMode.Nearest
-        let enemy2 = SKTexture(imageNamed: "minion_eagle.2")
-        enemy2.filteringMode = SKTextureFilteringMode.Nearest
-        let enemy3 = SKTexture(imageNamed: "minion_eagle.3")
-        enemy3.filteringMode = SKTextureFilteringMode.Nearest
-        let enemy4 = SKTexture(imageNamed: "minion_eagle.4")
-        enemy4.filteringMode = SKTextureFilteringMode.Nearest
-        
-        let flap = SKAction.repeatActionForever(SKAction.animateWithTextures([enemy1,enemy2,enemy3,enemy4,enemy3,enemy2,enemy1], timePerFrame: 0.2))
-
-
-
-        
-        let kCCHaloLowAngle : CGFloat  = (200.0 * 3.14) / 180.0;
-        let kCCHaloHighAngle : CGFloat  = (340.0 * 3.14) / 180.0;
-        let kCCHaloSpeed: CGFloat = 100.0;
-        
-        
-        let enemy = SKSpriteNode(texture: enemy1)
-        
-         let direction : CGVector  = radiansToVector(randomInRange(kCCHaloLowAngle, high: kCCHaloHighAngle));
-        
-        enemy.physicsBody?.velocity = CGVectorMake(direction.dx * kCCHaloSpeed, direction.dy * kCCHaloSpeed)
-        
-        enemy.xScale = 0.3
-        enemy.yScale = 0.3
-        enemy.physicsBody = SKPhysicsBody(rectangleOfSize: enemy.size)
-        enemy.physicsBody?.dynamic = false
-        enemy.physicsBody?.categoryBitMask = PhysicsCategories.Enemy
-        enemy.physicsBody?.contactTestBitMask = PhysicsCategories.Hero
-        enemy.physicsBody?.collisionBitMask = PhysicsCategories.Hero
-        enemy.name = "enemy"
-        
-        let actualX = random(min: enemy.size.width/2, max: size.width - enemy.size.height - 90)
-        
-        
-        //enemy.position = CGPointMake(random(min: enemy.size.width * 0.5, max: self.size.width - (enemy.size.width * 0.5)), self.size.height + (enemy.size.height * 0.5))
-        enemy.position = CGPointMake(randomInRange(enemy.size.width * 0.5, high: self.size.width - (enemy.size.width * 0.5) - 60), self.size.height + (enemy.size.height * 0.5))
-        addChild(enemy)
-        
-        let actualDuration = random(min: CGFloat(5), max: CGFloat(10.0))
-        
-        let actionMove = SKAction.moveTo(CGPoint(x: actualX, y: -10), duration: NSTimeInterval(actualDuration))
-        //let actionMoveDone = SKAction.removeFromParent()
-        enemy.runAction(SKAction.sequence([actionMove]))
-        enemy.runAction(flap)
-
-    }
-    
-    func addBoss(){
-        
-        
-        let kCCHaloLowAngle : CGFloat  = (200.0 * 3.14) / 180.0;
-        let kCCHaloHighAngle : CGFloat  = (340.0 * 3.14) / 180.0;
-        let kCCHaloSpeed: CGFloat = 100.0;
-        
-        self.removeActionForKey("addEnemy")
-        self.bossIsPresent = true
-        bossEnemy = SKSpriteNode(imageNamed: "mighty_eagle")
-        bossEnemy?.xScale = 0.3
-        bossEnemy?.yScale = 0.3
-        
-        let direction : CGVector  = radiansToVector(randomInRange(kCCHaloLowAngle, high: kCCHaloHighAngle));
-        
-        bossEnemy!.physicsBody?.velocity = CGVectorMake(direction.dx * kCCHaloSpeed, direction.dy * kCCHaloSpeed)
-        
-        
-        bossEnemy!.physicsBody = SKPhysicsBody(rectangleOfSize: bossEnemy!.size)
-        bossEnemy!.physicsBody?.dynamic = false
-        bossEnemy?.physicsBody?.allowsRotation = false
-        bossEnemy?.physicsBody?.affectedByGravity = false
-        bossEnemy!.physicsBody?.categoryBitMask = PhysicsCategories.Boss
-        bossEnemy!.physicsBody?.contactTestBitMask = PhysicsCategories.Hero
-        bossEnemy!.physicsBody?.collisionBitMask = PhysicsCategories.Hero
-        bossEnemy!.name = "enemy"
-        bossHealth = 3
-        
-        let actualX = random(min: bossEnemy!.size.width/2, max: size.width - bossEnemy!.size.height)
-        
-
-        bossEnemy!.position = CGPointMake(randomInRange(bossEnemy!.size.width * 0.5, high: self.size.width - (bossEnemy!.size.width * 0.5)), self.size.height + (bossEnemy!.size.height * 0.5))
-        addChild(bossEnemy!)
-        
-        let actualDuration = random(min: CGFloat(20), max: CGFloat(50))
-        
-        let actionMove = SKAction.moveTo(CGPoint(x: actualX, y: -10), duration: NSTimeInterval(actualDuration))
-        bossEnemy!.runAction(SKAction.sequence([actionMove]))
-
-        
-
-        
-    
-    }
-    
-    //MARK - Crosshair movient
-    func crosshairMoviment(node:SKSpriteNode){
-        let firstMoviment = SKAction.rotateByAngle(CGFloat(-75  * M_PI / 180), duration: 1)
-        
-        let secondMoviment = SKAction.rotateByAngle(CGFloat((5 * M_PI / 6 )), duration: 1)
-        
-        let clockWiseMoviment = SKAction.rotateByAngle(CGFloat(-5 * M_PI / 6 ), duration: 1)
-        
-        let antiClockWiseMoviment = SKAction.rotateByAngle(CGFloat(5 * M_PI / 6), duration: 1)
-    
-        let action = SKAction.repeatActionForever(SKAction.sequence([clockWiseMoviment,antiClockWiseMoviment]))
-        
-        node.runAction(firstMoviment, withKey:"firstMoviment")
-        node.runAction(secondMoviment, withKey: "secondMovimet")
-        
-        node.runAction(action,withKey:"crosshairAction")
-        
-        
-    }
-    
-
-    
-    
     
     //Low level press events
     override func pressesBegan(presses: Set<UIPress>, withEvent event: UIPressesEvent?) {
         
         super.pressesBegan(presses, withEvent: event)
         
-
         if gameOver == false {
             for item in presses {
                 
@@ -382,11 +176,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     self.startTime = NSDate()
                     crosshair?.removeAllActions()
                     
-                    self.changeCrosshairScale()
-                    
                     self.timer = NSTimer.scheduledTimerWithTimeInterval(0.2, target: self, selector: #selector(changeCrosshairScale), userInfo: nil, repeats: true)
                     timer?.fire()
-                    
                 }
             }
 
@@ -394,7 +185,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             self.timer?.invalidate()
         }
     }
-    
     
     
     
@@ -413,37 +203,34 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         if timePressed < 0.2 {
                             self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
                             self.hitTheFloor = false
-                            self.jump(90)
+                            self.isJumping = heroAct.jump(90, crosshair: crosshair!,hero: hero!, isJumping: isJumping, scene:self)
 
                         }else
                             if timePressed > 0.5 {
                                 self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
                                 self.hitTheFloor = false
-                                self.jump(120)
-
+                                self.isJumping = heroAct.jump(120, crosshair: crosshair!,hero: hero!, isJumping: isJumping, scene:self)
+                                
                             }else {
                                 self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
                                 self.hitTheFloor = false
-                                self.jump(60)
+                                self.isJumping = heroAct.jump(60, crosshair: crosshair!,hero: hero!, isJumping: isJumping, scene:self)
                         }
 
                     }else if isJumping == true {
                         if avaliableImpulse > 0 {
                             //print("Impulsing")
-                            self.impulse(60)
+                            heroAct.impulse(60, crosshair:crosshair!, hero:hero!, scene:self)
                             avaliableImpulse -= 1
                             self.boostLbl!.text = "BOOST: \(avaliableImpulse)"
                         }
                         
-                        
-                        
                     }
                     
-                    //print("released\(timePressed)")
                     self.crosshair?.zRotation = 0.0
                     self.crosshair?.zPosition = 0.0
                     
-                    self.crosshairMoviment(crosshair!)
+                    gameAct.crosshairMoviment(crosshair!)
                     timer?.invalidate()
                     
                 }
@@ -455,52 +242,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
     }
     
-    //MARK:- impulse action
-
-    /**
-     Perform a jump in  scree
-     
-     - parameter yAxis: CGFloat
-     */
-    func jump(velocity:CGFloat){
-        isJumping = true
-        //print(crosshair!.zRotation)
-        let direction = crosshair!.zRotation - CGFloat(M_PI)/2
-        
-        self.emiterFromJump(hero!.position)
-        
-        hero!.physicsBody?.velocity = CGVector(dx: velocity * -cos(direction) * 10, dy: velocity * -sin(direction) * 10)
-        
-        let heroJ1 = SKTexture(imageNamed: "fulero_spining.1")
-        heroJ1.filteringMode = SKTextureFilteringMode.Nearest
-        let heroJ2 = SKTexture(imageNamed: "fulero_spining.2")
-        heroJ2.filteringMode = SKTextureFilteringMode.Nearest
-        let heroJ3 = SKTexture(imageNamed: "fulero_spining.3")
-        heroJ3.filteringMode = SKTextureFilteringMode.Nearest
-        let heroJ4 = SKTexture(imageNamed: "fulero_spining.4")
-        heroJ4.filteringMode = SKTextureFilteringMode.Nearest
-        let heroJ5 = SKTexture(imageNamed: "fulero_spining.5")
-        heroJ5.filteringMode = SKTextureFilteringMode.Nearest
-        let heroJ6 = SKTexture(imageNamed: "fulero_spining.6")
-        heroJ6.filteringMode = SKTextureFilteringMode.Nearest
-        
-        let spinning = SKAction.repeatActionForever(SKAction.animateWithTextures([heroJ1,heroJ2,heroJ3,heroJ4,heroJ5,heroJ6], timePerFrame: 0.1))
-        hero!.runAction(spinning, withKey: "spinning")
-        
-        self.crosshair?.hidden = true
-
-    }
-    
-    func impulse(velocity:CGFloat){
-        
-        print(crosshair!.zRotation)
-        let direction = crosshair!.zRotation - CGFloat(M_PI)/2
-        
-        self.emiterFromJump(hero!.position)
-        
-        hero!.physicsBody?.velocity = CGVector(dx:velocity * -cos(direction) * 10, dy: velocity * -sin(direction) * 10)
-
-    }
     
 
     
@@ -522,7 +263,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             //print("HIT THE FLOOR")
             hero!.removeActionForKey("spinning")
             hero!.texture = SKTexture(imageNamed: "fulero_idle.1")
-            self.fuleroIdle()
+            act.fuleroIdle(hero!)
             isJumping = false
             hero!.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
             self.hitTheFloor = true
@@ -540,27 +281,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 self.numOfPoints += 15
                 self.recordPoints += 15
                 self.enemyContact = true
-                self.explosion((secondBody.node as! SKSpriteNode).position)
-                self.removeEnemy(secondBody.node as! SKSpriteNode)
+                act.explosion((secondBody.node as! SKSpriteNode).position, scene: self)
+                gameAct.removeEnemy(secondBody.node as! SKSpriteNode)
 
             }else{
-                self.removeEnemy(secondBody.node as! SKSpriteNode)
+                gameAct.removeEnemy(secondBody.node as! SKSpriteNode)
             }
         }else if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0 && ((secondBody.categoryBitMask & PhysicsCategories.Boss) != 0)){
             if (bossHealth > 0) {
                 bossHealth -= 1
-                self.emiterFromBossHit(bossEnemy!.position)
-                self.hitBossLbl((bossEnemy?.position)!)
+                act.emiterFromBossHit(bossEnemy!.position, scene: self)
+                gameAct.hitBossLbl((bossEnemy?.position)!, scene:self)
                 self.hero!.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
             }else{
-                self.explosion((secondBody.node as! SKSpriteNode).position)
+                act.explosion((secondBody.node as! SKSpriteNode).position, scene: self)
                 bossEnemy!.removeFromParent()
                 bossIsPresent = false
                 self.numOfPoints += 30
                 self.recordPoints += 30
                 runAction(SKAction.repeatActionForever(
                     SKAction.sequence([
-                        SKAction.runBlock(addEnemy),
+                        SKAction.runBlock({self.enemy.addEnemy(self)}),
                         SKAction.waitForDuration(4.0)
                         ])
                     ), withKey: "addEnemy")
@@ -569,41 +310,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     //MARK:- Game actions
-    func removeEnemy(enemy:SKSpriteNode){
-        enemy.removeFromParent()
-    }
     
-    func updateEnemy(enemy:SKNode){
+    func updateEnemy(enemy:SKNode ){
         
         if enemy.frame.minY <= 90 {
             
             if gameOver == false {
                 enemy.removeFromParent()
                 health -= 10
-                self.healthLbl?.text = "HEALTH: \(health)"
+                healthLbl!.text = "HEALTH: \(health)"
                 
             }
             
             if health == 0 {
                 gameOver = true
-                self.isGameOver()
+                isGameOver()
                 enemy.removeFromParent()
             }
             
         }
     }
-    
-    func updatePoints(){
-        if enemyContact {
-            self.pointsLbl?.text = "POINTS: \(numOfPoints)"
-        }
-    }
+
     
     func updateBoss(){
         if bossEnemy?.frame.minY <=  90 {
             if gameOver == false {
-                self.explosion((self.bossEnemy?.position)!)
-                
+                act.explosion((self.bossEnemy?.position)!,scene: self)
                 bossEnemy?.removeFromParent()
                 health -= 30
                 if health > 0 {
@@ -614,32 +346,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 }
                 bossIsPresent = false
             }else{
-                self.explosion((self.bossEnemy?.position)!)
+                act.explosion((self.bossEnemy?.position)!, scene: self)
                 bossEnemy?.removeFromParent()
                 bossIsPresent = false
             }
 
             
-            
         }
         
-//        if bossEnemy?.position.y < 0 {
-//            if gameOver == false {
-//                self.explosion((self.bossEnemy?.position)!)
-//
-//                bossEnemy?.removeFromParent()
-//                health -= 30
-//                if health > 0 {
-//                    self.healthLbl?.text = "HEALTH: \(health)"
-//                }else{
-//                    self.healthLbl?.text = "HEALTH: \(0)"
-//                    self.isGameOver()
-//                }
-//                bossIsPresent = false
-//            }
-//        }
     }
-    
+        
     /**
      ends the game
      */
@@ -677,11 +393,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
              NSUserDefaults.standardUserDefaults().setInteger(recordPoints, forKey: "record")
         }
         
-        //self.addChild(restartLbl!)
         
-        
-        
-
     }
     /**
      Restart all the stats of game
@@ -698,12 +410,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.crosshair?.xScale = 0.9
         self.crosshair?.zRotation = 0.0
         self.crosshair?.zPosition = 0.0
-        self.crosshairMoviment(crosshair!)
+        gameAct.crosshairMoviment(crosshair!)
         
         self.healthLbl?.text = "HEALTH: \(health)"
         self.gameOverLabel?.removeFromParent()
         self.restartLbl?.removeFromParent()
-        self.loadRecord()
+        gameAct.loadRecord(self.recordLbl!, recordPoints:self.recordPoints)
         
         //get all the nodes with the same type
         enumerateChildNodesWithName("enemy") { (enemy, _) in
@@ -712,91 +424,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         runAction(SKAction.repeatActionForever(
             SKAction.sequence([
-                SKAction.runBlock(addEnemy),
+                SKAction.runBlock({self.enemy.addEnemy(self)}),
                 SKAction.waitForDuration(4.0)
                 ])
             ), withKey: "addEnemy")
-
-        
-        
     }
     
-    func explosion(pos: CGPoint) {
-        let emitterNode = SKEmitterNode(fileNamed: "ExplosionParticle.sks")
-        emitterNode!.particlePosition = pos
-        self.addChild(emitterNode!)
-        // Don't forget to remove the emitter node after the explosion
-        self.runAction(SKAction.waitForDuration(2), completion: { emitterNode!.removeFromParent() })
-        
-    }
-    
-    func emiterFromJump(pos:CGPoint){
-        let emitterNode = SKEmitterNode(fileNamed: "JumpSmoke.sks")
-        emitterNode!.particlePosition = pos
-        self.addChild(emitterNode!)
-        // Don't forget to remove the emitter node after the jump
-        self.runAction(SKAction.waitForDuration(2), completion: { emitterNode!.removeFromParent() })
-    }
-    
-    func emiterFromBossHit(pos:CGPoint){
-        let emitterNode = SKEmitterNode(fileNamed: "BossHit.sks")
-        emitterNode!.particlePosition = pos
-        self.addChild(emitterNode!)
-        // Don't forget to remove the emitter node after the jump
-        self.runAction(SKAction.waitForDuration(2), completion: { emitterNode!.removeFromParent() })
-    }
     
     func changeCrosshairScale(){
         let xScale = crosshair!.xScale
         let yScale = crosshair!.yScale
         
         if xScale < 2.0 {
-            crosshair?.xScale = xScale + 0.1
-            crosshair?.yScale = yScale + 0.1
-            crosshair?.color = UIColor.redColor()
+            crosshair!.xScale = xScale + 0.1
+            crosshair!.yScale = yScale + 0.1
+            crosshair!.color = UIColor.redColor()
         }
     }
-    
-    func hitBossLbl(pos:CGPoint){
-        let hitLabel = SKLabelNode(fontNamed: "Arial")
-        hitLabel.fontColor = UIColor.blackColor()
-        hitLabel.fontSize = 20
-        hitLabel.position = pos
-        hitLabel.text = "-1"
-        self.addChild(hitLabel)
-        
-        self.runAction(SKAction.waitForDuration(2),completion:{hitLabel.removeFromParent()})
-    }
-    
-    func loadRecord (){
-        
-        if let rcrd = NSUserDefaults.standardUserDefaults().integerForKey("record") as? Int {
-            self.recordLbl?.text = "RECORD: \(rcrd)"
-        }else {
-            self.recordLbl?.text = "RECORD: \(recordPoints)"
-        }
-    }
-    
-    func fuleroIdle (){
-        let heroI1 = SKTexture(imageNamed: "fulero_idle.1")
-        heroI1.filteringMode = SKTextureFilteringMode.Nearest
-        let heroI2 = SKTexture(imageNamed: "fulero_idle.2")
-        heroI2.filteringMode = SKTextureFilteringMode.Nearest
-        let heroI3 = SKTexture(imageNamed: "fulero_idle.3")
-        heroI3.filteringMode = SKTextureFilteringMode.Nearest
-        let heroI4 = SKTexture(imageNamed: "fulero_idle.4")
-        heroI4.filteringMode = SKTextureFilteringMode.Nearest
-        let heroI5 = SKTexture(imageNamed: "fulero_idle.5")
-        heroI5.filteringMode = SKTextureFilteringMode.Nearest
-        let heroI6 = SKTexture(imageNamed: "fulero_idle.6")
-        heroI6.filteringMode = SKTextureFilteringMode.Nearest
-        
-        let idle = SKAction.repeatActionForever(SKAction.animateWithTextures([heroI1,heroI2,heroI3,heroI4,heroI5,heroI6], timePerFrame: 0.2))
-        hero!.runAction(idle, withKey: "idle")
-    }
-    
 
     
+
+
+    
+    
+
     
 
     
