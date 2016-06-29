@@ -34,6 +34,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var floor:SKSpriteNode?
     var startTime:NSDate?
     var endDate:NSDate?
+    var backgroundMusic: SKAudioNode!
+    var minionEagleSound: SKAudioNode!
     
     var healthLbl:SKLabelNode?
     var pointsLbl:SKLabelNode?
@@ -94,9 +96,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         labels.createPointsLabel(self.pointsLbl!, scene: self, numOfPoints:numOfPoints)
         
         self.recordLbl = SKLabelNode(fontNamed: "Futura")
+        
         labels.createRecordLabel(self.recordLbl!, scene:self, recordPoints:recordPoints)
         
         gameAct.loadRecord(self.recordLbl!, recordPoints: self.recordPoints)
+
+
+        let backgroundURL = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("somjogo", ofType: "mp3")!)
+        backgroundMusic = SKAudioNode(URL: backgroundURL)
+        addChild(backgroundMusic)
+        
+
         
         
         //set the physics world
@@ -159,7 +169,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
         gameAct.updatePoints(enemyContact, numOfPoints: numOfPoints, pointsLbl:pointsLbl!)
-        
+
     }
 
     
@@ -283,6 +293,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 self.enemyContact = true
                 act.explosion((secondBody.node as! SKSpriteNode).position, scene: self)
                 gameAct.removeEnemy(secondBody.node as! SKSpriteNode)
+                runAction(SKAction.playSoundFileNamed("MinionEagleSound.wav", waitForCompletion: false))
 
             }else{
                 gameAct.removeEnemy(secondBody.node as! SKSpriteNode)
@@ -299,6 +310,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 bossIsPresent = false
                 self.numOfPoints += 30
                 self.recordPoints += 30
+                runAction(SKAction.playSoundFileNamed("MightEagleSound.wav", waitForCompletion: false))
                 runAction(SKAction.repeatActionForever(
                     SKAction.sequence([
                         SKAction.runBlock({self.enemy.addEnemy(self)}),

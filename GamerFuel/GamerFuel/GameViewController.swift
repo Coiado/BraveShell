@@ -8,16 +8,18 @@
 
 import UIKit
 import SpriteKit
+import AVFoundation
 
 class GameViewController: UIViewController {
     
     let gameScene = GameScene(fileNamed: "GameScene")
     var menu:MenuScene?
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
 
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Release any cached data, images, etc that aren't in use.

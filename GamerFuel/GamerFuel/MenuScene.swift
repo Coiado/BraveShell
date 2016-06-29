@@ -15,13 +15,13 @@ class MenuScene: SKScene {
     var playButton = SKSpriteNode()
     let playButtonTex = SKTexture(imageNamed: "play_button")
     var gScene:GameScene?
+    
 
-    
-    
     var titleLabel: SKLabelNode?
     var newGameLabel:SKLabelNode?
     var bcImage:SKSpriteNode?
     var logo:SKSpriteNode?
+    var backgroundMusic: SKAudioNode!
     
     override func didMoveToView(view: SKView) {
         
@@ -52,7 +52,9 @@ class MenuScene: SKScene {
         self.titleLabel?.text = "The Brave Shell"
         self.newGameLabel?.text = "new game"
         
-    
+        let backgroundURL = NSURL(fileURLWithPath: NSBundle.mainBundle().pathForResource("somstart", ofType: "mp3")!)
+        backgroundMusic = SKAudioNode(URL: backgroundURL)
+        addChild(backgroundMusic)
         
         //self.titleLabel?.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!) ,y:CGRectGetMidY((self.scene?.frame)!) - (playButton.frame.height))
         //self.titleLabel?.position = CGPoint(x: CGRectGetMidX((self.scene?.frame)!) ,y:CGRectGetMidY((self.scene?.frame)!))
@@ -96,6 +98,7 @@ class MenuScene: SKScene {
 //                }
 //            }
 //        }
+
         
         
 //        
@@ -104,6 +107,7 @@ class MenuScene: SKScene {
         
         playButton.runAction(SKAction.sequence([SKAction.scaleXTo(2.0, y: 2.0, duration: 0.2), SKAction.scaleXTo(1.5, y: 1.5, duration: 0.2)])) {
             self.createView()
+
         }
        
         

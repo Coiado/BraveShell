@@ -49,7 +49,7 @@ class HeroActions {
     }
     
     
-    //MARK:- impulse action    
+    //MARK:- impulse action
     func impulse(velocity:CGFloat, crosshair:SKSpriteNode,hero:SKSpriteNode, scene:SKScene ){
         
         print(crosshair.zRotation)
