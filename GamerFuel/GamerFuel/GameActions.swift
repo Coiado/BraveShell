@@ -11,6 +11,9 @@ import SpriteKit
 
 class GameActions {
     
+    //properties
+    let act = Actions()
+    
 
     func loadRecord (recordLbl:SKLabelNode, recordPoints:Int){
         
@@ -50,13 +53,9 @@ class GameActions {
     //MARK - Crosshair movient
     func crosshairMoviment(node:SKSpriteNode){
         let firstMoviment = SKAction.rotateByAngle(CGFloat(-75  * M_PI / 180), duration: 1)
-        
         let secondMoviment = SKAction.rotateByAngle(CGFloat((5 * M_PI / 6 )), duration: 1)
-        
         let clockWiseMoviment = SKAction.rotateByAngle(CGFloat(-5 * M_PI / 6 ), duration: 1)
-        
         let antiClockWiseMoviment = SKAction.rotateByAngle(CGFloat(5 * M_PI / 6), duration: 1)
-        
         let action = SKAction.repeatActionForever(SKAction.sequence([clockWiseMoviment,antiClockWiseMoviment]))
         
         node.runAction(firstMoviment, withKey:"firstMoviment")
@@ -77,9 +76,33 @@ class GameActions {
             pointsLbl.text = "POINTS: \(numOfPoints)"
         }
     }
-
-
-
+    
+    
+    func heroHitTheFloor(hero:SKSpriteNode, crosshair:SKSpriteNode){
+        hero.removeActionForKey("spinning")
+        hero.texture = SKTexture(imageNamed: "fulero_idle.1")
+        act.fuleroIdle(hero)
+        hero.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+        crosshair.hidden = false
+        crosshair.yScale = 0.9
+        crosshair.xScale = 0.9
+    }
+    
+    func heroHitEnemy(hero:SKSpriteNode, enemy:SKSpriteNode, scene:SKScene){
+            hero.removeActionForKey("spinning")
+            hero.texture = SKTexture(imageNamed: "fulero_falling")
+            act.explosion(enemy.position, scene: scene)
+            self.removeEnemy(enemy)
+            scene.runAction(SKAction.playSoundFileNamed("MinionEagleSound.wav", waitForCompletion: false))
+    }
+    
+    func destroyBossEnemy(bossEnemy:SKSpriteNode, scene:SKScene){
+        act.explosion(bossEnemy.position, scene: scene)
+        bossEnemy.removeFromParent()
+        scene.runAction(SKAction.playSoundFileNamed("MightEagleSound.wav", waitForCompletion: false))
+    }
+    
+    
 
 
     

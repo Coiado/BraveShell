@@ -66,7 +66,7 @@ class Enemy {
         
     }
     
-    func addBoss(bossEnemy:SKSpriteNode, scene:SKScene, bossIsPresent:Bool){
+    func addBoss(bossEnemy:SKSpriteNode, scene:SKScene){
         
         
         let kCCHaloLowAngle : CGFloat  = (200.0 * 3.14) / 180.0;

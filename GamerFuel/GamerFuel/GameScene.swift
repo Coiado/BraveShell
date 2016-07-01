@@ -70,11 +70,27 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let labels = Labels()
     let gameAct  = GameActions()
     let heroAct = HeroActions()
+    let worldPhysic = WorldPhysic()
+    
+    var xValueInitial:Float?
+    var yValueInitial:Float?
+    
+    var xValueFinal:Float?
+    var yValueFinal:Float?
+    
+    
+    var controller:[GCController]?
+    var validControler:GCController?
     
     
     //Life cycle view
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
+        
+        //setup the controller
+        controller = GCController.controllers()
+        validControler = controller![0]
+        //validControler?.microGamepad?.allowsRotation = true
         
         hero = SKSpriteNode(imageNamed: "fulero_idle.1")
         background = SKSpriteNode(imageNamed: "background")
@@ -106,22 +122,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         backgroundMusic = SKAudioNode(URL: backgroundURL)
         addChild(backgroundMusic)
         
-
-        
         
         //set the physics world
-        self.physicsWorld.gravity = CGVector(dx: 0, dy: 0)
         self.physicsWorld.contactDelegate = self
-        //let borderBody = SKPhysicsBody(edgeLoopFromRect: self.frame)
-        let borderBody = SKPhysicsBody(edgeLoopFromRect: CGRect(origin: CGPointMake(0, 60), size: CGSize(width: 1280, height: 660)))
-        borderBody.friction = 1
-        borderBody.restitution = 0
-        self.physicsBody = borderBody
-        self.name = "edge"
+        self.worldPhysic.setWorldPhysic(self)
+        
     
         
         //crosshair config
-        gameAct.crosshairMoviment(self.crosshair!)
+        //gameAct.crosshairMoviment(self.crosshair!)
         
         
         
@@ -133,6 +142,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             ), withKey: "addEnemy")
         
         addEnemyTimer?.fire()
+        
+        
+        //controller.microGamepad?.allowsRotation = true
     }
     
     
@@ -145,23 +157,40 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         if gameOver{
             self.restartTheGame()
+        }else{
+            xValueInitial = validControler!.microGamepad?.dpad.xAxis.value
+            yValueInitial = validControler!.microGamepad?.dpad.yAxis.value
+            
+            print("x initial value \(xValueInitial) ,Y initial value \(yValueInitial)")
         }
+    }
+    
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        xValueFinal = validControler!.microGamepad?.dpad.xAxis.value
+        yValueFinal = validControler!.microGamepad?.dpad.yAxis.value
+        
+        print("x Final value \(xValueFinal) ,Y Final value \(yValueFinal)")
+        
+        
+    }
+    
+    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        crosshair?.zRotation = CGFloat(((validControler?.microGamepad?.dpad.xAxis.value)! * (-1)))
     }
    
     //MARK: - Screen update
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
         
-//         if numOfPoints % 20 == 0 && numOfPoints > 0 && bossIsPresent != true {
-//            self.addBoss()
-//        }
-//        
-//        if bossIsPresent {
-//            updateBoss()
-//        }
+         if numOfPoints % 20 == 0 && numOfPoints > 0 && bossIsPresent != true {
+            bossIsPresent = true
+            bossEnemy = SKSpriteNode(imageNamed: "mighty_eagle")
+            enemy.addBoss(bossEnemy!, scene: self)
+        }
         
-        
-     
+        if bossIsPresent {
+            updateBoss()
+        }
         
         enumerateChildNodesWithName("enemy") { (enemy, _) in
             if enemy.position.y <= 0 {
@@ -209,27 +238,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     
                     if isJumping == false {
                         
-                        
                         if timePressed < 0.2 {
-                            self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
-                            self.hitTheFloor = false
+                            
+                            hitTheFloor = worldPhysic.adjustGravity(self)
                             self.isJumping = heroAct.jump(90, crosshair: crosshair!,hero: hero!, isJumping: isJumping, scene:self)
 
                         }else
                             if timePressed > 0.5 {
-                                self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
-                                self.hitTheFloor = false
+
+                                hitTheFloor = worldPhysic.adjustGravity(self)
                                 self.isJumping = heroAct.jump(120, crosshair: crosshair!,hero: hero!, isJumping: isJumping, scene:self)
                                 
                             }else {
-                                self.physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
-                                self.hitTheFloor = false
+
+                                hitTheFloor = worldPhysic.adjustGravity(self)
                                 self.isJumping = heroAct.jump(60, crosshair: crosshair!,hero: hero!, isJumping: isJumping, scene:self)
                         }
 
                     }else if isJumping == true {
                         if avaliableImpulse > 0 {
-                            //print("Impulsing")
                             heroAct.impulse(60, crosshair:crosshair!, hero:hero!, scene:self)
                             avaliableImpulse -= 1
                             self.boostLbl!.text = "BOOST: \(avaliableImpulse)"
@@ -239,8 +266,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     
                     self.crosshair?.zRotation = 0.0
                     self.crosshair?.zPosition = 0.0
-                    
-                    gameAct.crosshairMoviment(crosshair!)
+                    //gameAct.crosshairMoviment(crosshair!)
                     timer?.invalidate()
                     
                 }
@@ -251,6 +277,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
 
     }
+    
+    
     
     
 
@@ -270,31 +298,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         
         if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0) && ((secondBody.categoryBitMask & PhysicsCategories.floor) != 0) {
-            //print("HIT THE FLOOR")
-            hero!.removeActionForKey("spinning")
-            hero!.texture = SKTexture(imageNamed: "fulero_idle.1")
-            act.fuleroIdle(hero!)
-            isJumping = false
-            hero!.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+            self.isJumping = false
+            gameAct.heroHitTheFloor(hero!, crosshair:crosshair!)
             self.hitTheFloor = true
-            self.crosshair?.hidden = false
-            self.crosshair?.yScale = 0.9
-            self.crosshair?.xScale = 0.9
 
             
         }else if ((firstBody.categoryBitMask & PhysicsCategories.Hero) != 0 && ((secondBody.categoryBitMask & PhysicsCategories.Enemy) != 0)) {
             
-            //print("HIT AN ENEMY")
-            if gameOver == false{
-                self.hero!.removeActionForKey("spinning")
-                self.hero!.texture = SKTexture(imageNamed: "fulero_falling")
-                self.numOfPoints += 15
-                self.recordPoints += 15
-                self.enemyContact = true
-                act.explosion((secondBody.node as! SKSpriteNode).position, scene: self)
-                gameAct.removeEnemy(secondBody.node as! SKSpriteNode)
-                runAction(SKAction.playSoundFileNamed("MinionEagleSound.wav", waitForCompletion: false))
-
+            
+            if gameOver == false {
+                numOfPoints  += 15
+                recordPoints += 15
+                enemyContact = true
+                gameAct.heroHitEnemy(firstBody.node as! SKSpriteNode, enemy: secondBody.node as! SKSpriteNode, scene: self)
             }else{
                 gameAct.removeEnemy(secondBody.node as! SKSpriteNode)
             }
@@ -303,20 +319,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 bossHealth -= 1
                 act.emiterFromBossHit(bossEnemy!.position, scene: self)
                 gameAct.hitBossLbl((bossEnemy?.position)!, scene:self)
-                self.hero!.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+                hero!.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
             }else{
-                act.explosion((secondBody.node as! SKSpriteNode).position, scene: self)
-                bossEnemy!.removeFromParent()
-                bossIsPresent = false
                 self.numOfPoints += 30
                 self.recordPoints += 30
-                runAction(SKAction.playSoundFileNamed("MightEagleSound.wav", waitForCompletion: false))
+                bossIsPresent = false
+                gameAct.destroyBossEnemy(bossEnemy!, scene:self)
                 runAction(SKAction.repeatActionForever(
                     SKAction.sequence([
                         SKAction.runBlock({self.enemy.addEnemy(self)}),
                         SKAction.waitForDuration(4.0)
                         ])
                     ), withKey: "addEnemy")
+
             }
         }
     }
@@ -335,9 +350,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
             
             if health == 0 {
+                enemy.removeFromParent()
                 gameOver = true
                 isGameOver()
-                enemy.removeFromParent()
+                
             }
             
         }

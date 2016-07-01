@@ -26,12 +26,9 @@
 		6BA234931D142C0A00393A22 /* ExplosionParticle.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6BA234911D142C0A00393A22 /* ExplosionParticle.sks */; };
 		6BA234941D142C0A00393A22 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 6BA234921D142C0A00393A22 /* spark.png */; };
 		6BA234981D142E9B00393A22 /* JumpSmoke.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6BA234961D142E9B00393A22 /* JumpSmoke.sks */; };
+		6BA982061D26AFC800800765 /* WorldPhysic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA982051D26AFC800800765 /* WorldPhysic.swift */; };
 		6BB716F81D1976AE00C55D95 /* MenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB716F71D1976AE00C55D95 /* MenuViewController.swift */; };
 		6BB716FA1D1AAF2E00C55D95 /* BossHit.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6BB716F91D1AAF2E00C55D95 /* BossHit.sks */; };
-		6BCA4C6C1D1BFC08002208CF /* MightEagleSound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6BCA4C681D1BFC08002208CF /* MightEagleSound.mp3 */; };
-		6BCA4C6D1D1BFC08002208CF /* MinionEagleSound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6BCA4C691D1BFC08002208CF /* MinionEagleSound.mp3 */; };
-		6BCA4C6E1D1BFC08002208CF /* somjogo.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6BCA4C6A1D1BFC08002208CF /* somjogo.mp3 */; };
-		6BCA4C6F1D1BFC08002208CF /* somstart.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6BCA4C6B1D1BFC08002208CF /* somstart.mp3 */; };
 		6BFBC0AA1D1D46C3003BDB0F /* Hero.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BFBC0A91D1D46C3003BDB0F /* Hero.swift */; };
 		6BFBC0AD1D1D49C7003BDB0F /* Actions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BFBC0AC1D1D49C7003BDB0F /* Actions.swift */; };
 		6BFBC0AF1D1D4B46003BDB0F /* Crosshair.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BFBC0AE1D1D4B46003BDB0F /* Crosshair.swift */; };
@@ -41,7 +38,6 @@
 		6BFBC0B81D1D51E0003BDB0F /* Labels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BFBC0B71D1D51E0003BDB0F /* Labels.swift */; };
 		6BFBC0BA1D1D59CE003BDB0F /* GameActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BFBC0B91D1D59CE003BDB0F /* GameActions.swift */; };
 		6BFBC0C01D23F05C003BDB0F /* HeroActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BFBC0BF1D23F05C003BDB0F /* HeroActions.swift */; };
-
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -100,6 +96,7 @@
 		6BA234911D142C0A00393A22 /* ExplosionParticle.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; name = ExplosionParticle.sks; path = ../ExplosionParticle.sks; sourceTree = "<group>"; };
 		6BA234921D142C0A00393A22 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spark.png; path = ../spark.png; sourceTree = "<group>"; };
 		6BA234961D142E9B00393A22 /* JumpSmoke.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = JumpSmoke.sks; sourceTree = "<group>"; };
+		6BA982051D26AFC800800765 /* WorldPhysic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorldPhysic.swift; sourceTree = "<group>"; };
 		6BB716F71D1976AE00C55D95 /* MenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuViewController.swift; sourceTree = "<group>"; };
 		6BB716F91D1AAF2E00C55D95 /* BossHit.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = BossHit.sks; sourceTree = "<group>"; };
 		6BCA4C681D1BFC08002208CF /* MightEagleSound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = MightEagleSound.mp3; sourceTree = "<group>"; };
@@ -165,6 +162,7 @@
 		6B47AD141D099A6200910647 /* GamerFuel */ = {
 			isa = PBXGroup;
 			children = (
+				6BA982041D26AF9200800765 /* Physiques */,
 				6BFBC0B41D1D50E9003BDB0F /* Util */,
 				6BFBC0AB1D1D49B7003BDB0F /* Actions */,
 				6BFBC0A81D1D441F003BDB0F /* Entities */,
@@ -217,6 +215,14 @@
 				6BB716F91D1AAF2E00C55D95 /* BossHit.sks */,
 			);
 			name = Emiters;
+			sourceTree = "<group>";
+		};
+		6BA982041D26AF9200800765 /* Physiques */ = {
+			isa = PBXGroup;
+			children = (
+				6BA982051D26AFC800800765 /* WorldPhysic.swift */,
+			);
+			name = Physiques;
 			sourceTree = "<group>";
 		};
 		6BCA4C671D1BFBA5002208CF /* Resources */ = {
@@ -367,8 +373,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				6B47AD211D099A6200910647 /* Main.storyboard in Resources */,
-
-				6BA234991D142E9B00393A22 /* spark.png in Resources */,
 				3FE9AD621D1BFF69004D0D84 /* Explosion5.wav in Resources */,
 				3F0B19AE1D229FDF008ADFD5 /* somjogo.mp3 in Resources */,
 				3F0B19AD1D229FDF008ADFD5 /* MinionEagleSound.wav in Resources */,
@@ -413,6 +417,7 @@
 				6BFBC0B81D1D51E0003BDB0F /* Labels.swift in Sources */,
 				6BB716F81D1976AE00C55D95 /* MenuViewController.swift in Sources */,
 				6B3EAF821D12C629005E4079 /* MenuScene.swift in Sources */,
+				6BA982061D26AFC800800765 /* WorldPhysic.swift in Sources */,
 				6B47AD1C1D099A6200910647 /* GameViewController.swift in Sources */,
 				6BFBC0B11D1D4C07003BDB0F /* Background.swift in Sources */,
 				6BFBC0B31D1D4DB5003BDB0F /* Enemy.swift in Sources */,
